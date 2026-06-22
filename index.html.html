@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f5132" />
+  <title>كشف السلامة اليومي</title>
+  <style>
+*{box-sizing:border-box}
+:root{
+  --green:#0f5132; --green2:#146c43; --bg:#f4f7f5; --card:#fff;
+  --line:#d9e2dc; --text:#1f2933; --muted:#69737b;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.topbar{
+  position:sticky; top:0; z-index:10;
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px; background:linear-gradient(135deg,var(--green),var(--green2));
+  color:#fff; box-shadow:0 8px 22px rgba(0,0,0,.13);
+}
+.topbar h1{margin:0;font-size:20px}
+.topbar p{margin:3px 0 0;font-size:13px;opacity:.9}
+.top-print{
+  border:1px solid rgba(255,255,255,.45); background:rgba(255,255,255,.12);
+  color:#fff; border-radius:12px; padding:10px 13px; font-weight:800;
+}
+.container{max-width:1050px;margin:auto;padding:14px;padding-bottom:96px}
+.card,.item{
+  background:var(--card); border:1px solid var(--line); border-radius:18px;
+  padding:14px; margin:12px 0; box-shadow:0 6px 18px rgba(0,0,0,.045);
+}
+.card h2{margin:0 0 12px;color:var(--green);font-size:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label span,.label-title{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:5px}
+input,textarea{
+  width:100%; border:1px solid var(--line); border-radius:12px;
+  padding:11px 10px; font-size:15px; outline:none; background:#fff;
+}
+textarea{min-height:42px;resize:vertical}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips input{display:none}
+.chips b{
+  display:inline-flex; min-width:76px; justify-content:center; border:1px solid var(--line);
+  border-radius:999px; padding:9px 12px; background:#fff;
+}
+.chips input:checked+b{background:var(--green);color:#fff;border-color:var(--green)}
+.summary-card{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}
+.summary-card div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px;text-align:center}
+.summary-card strong{display:block;color:var(--green);font-size:24px;line-height:1}
+.summary-card span{font-size:12px;color:var(--muted);font-weight:800}
+.item h3{display:flex;align-items:flex-start;gap:8px;margin:0 0 11px;font-size:16px}
+.num{background:#eaf6ee;color:var(--green);border-radius:10px;min-width:34px;padding:2px 7px;text-align:center}
+.group-title{margin:10px 0 6px;color:var(--muted);font-size:12px;font-weight:900}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.options.sev{grid-template-columns:repeat(4,1fr)}
+.options input{display:none}
+.options b{
+  display:flex; align-items:center; justify-content:center; border:1px solid var(--line);
+  border-radius:12px; min-height:40px; padding:8px 5px; font-size:13px;
+}
+input[value="يعمل"]:checked+b{background:#e9f8ee;color:#17633b;border-color:#58a873}
+input[value="يحتاج صيانة"]:checked+b{background:#fff5df;color:#7a4a00;border-color:#d39b27}
+input[value="متعطل"]:checked+b{background:#fdeceb;color:#8a1f11;border-color:#d06a5f}
+input[value="منخفضة"]:checked+b{background:#e9f8ee;color:#17633b;border-color:#58a873}
+input[value="متوسطة"]:checked+b{background:#fff8e8;color:#765000;border-color:#d1a02c}
+input[value="عالية"]:checked+b{background:#fff0e2;color:#7b3b00;border-color:#d77923}
+input[value="حرجة"]:checked+b{background:#fdeceb;color:#8a1f11;border-color:#c54d42}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.bottom-actions{
+  position:fixed; right:0; left:0; bottom:0; display:flex; gap:8px;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.96); border-top:1px solid var(--line); backdrop-filter:blur(8px);
+}
+button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;cursor:pointer}
+.primary{background:var(--green);color:#fff;flex:1}
+.ghost{background:#eef3ef;color:var(--green);flex:.75}
+.outline{background:#fff;color:var(--green);border:1px solid var(--green)}
+.print-area{display:none}
+
+@media(max-width:700px){
+  .topbar h1{font-size:18px}
+  .container{padding:10px;padding-bottom:98px}
+  .form-grid,.mini-grid{grid-template-columns:1fr}
+  .summary-card{grid-template-columns:repeat(2,1fr)}
+  .options.sev{grid-template-columns:repeat(2,1fr)}
+  .top-print{display:none}
+}
+
+/* طباعة صفحة واحدة: خط أكبر لكن بدون تمديد الورقة */
+@page{
+  size:A4 landscape;
+  margin:4mm;
+}
+@media print{
+  html,body{
+    width:100%;
+    height:auto;
+    margin:0!important;
+    background:#fff!important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  .topbar,.container,.bottom-actions{display:none!important}
+  .print-area{
+    display:block;
+    direction:rtl;
+    font-family:Tahoma,Arial,sans-serif;
+    color:#000;
+  }
+  .paper{
+    width:100%;
+    border:1.5px solid #000;
+    padding:3.2mm 4.2mm 3mm;
+    background:#fff;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  .paper-head{
+    position:relative;
+    height:12mm;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .logo-mark{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%) skew(-8deg);
+    width:24mm;
+    height:6mm;
+    line-height:6mm;
+    text-align:center;
+    border:1px solid #777;
+    color:#666;
+    font-weight:900;
+    font-size:10px;
+    letter-spacing:1.5px;
+  }
+  .print-area h1{
+    margin:5.5mm 0 0;
+    text-align:center;
+    text-decoration:underline;
+    font-size:16px;
+    font-weight:900;
+    line-height:1;
+  }
+  .print-info{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:0;
+    border:1px solid #000;
+    margin-bottom:1.6mm;
+    font-size:9.5px;
+    font-weight:700;
+  }
+  .print-info div{
+    min-height:5.2mm;
+    border-inline-start:1px solid #000;
+    border-bottom:1px solid #000;
+    padding:.8mm 1.4mm;
+    line-height:1.15;
+  }
+  .print-info div:nth-child(4n){border-inline-start:0}
+  .print-info div:nth-last-child(-n+4){border-bottom:0}
+  .print-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+    font-size:8.9px;
+    border:1.25px solid #000;
+  }
+  .print-table th,.print-table td{
+    border:1px solid #000;
+    padding:.62mm .75mm;
+    vertical-align:middle;
+    word-break:normal;
+    overflow-wrap:anywhere;
+    line-height:1.05;
+  }
+  .print-table th{
+    font-weight:900;
+    background:#f3f3f3;
+    text-align:center;
+    white-space:normal;
+  }
+  .print-table td.center{
+    text-align:center;
+    font-weight:900;
+    font-size:10px;
+    line-height:1;
+  }
+  .print-table th:nth-child(1),.print-table td:nth-child(1){width:3.2%}
+  .print-table th:nth-child(2),.print-table td:nth-child(2){width:25.6%}
+  .print-table th:nth-child(3),.print-table td:nth-child(3){width:8.8%}
+  .print-table th:nth-child(4),.print-table td:nth-child(4){width:5.6%}
+  .print-table th:nth-child(5),.print-table td:nth-child(5){width:7.0%}
+  .print-table th:nth-child(6),.print-table td:nth-child(6){width:5.6%}
+  .print-table th:nth-child(7),.print-table td:nth-child(7){width:5.7%}
+  .print-table th:nth-child(8),.print-table td:nth-child(8){width:5.7%}
+  .print-table th:nth-child(9),.print-table td:nth-child(9){width:5.7%}
+  .print-table th:nth-child(10),.print-table td:nth-child(10){width:5.7%}
+  .print-table th:nth-child(11),.print-table td:nth-child(11){width:21.4%}
+  .signatures{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:7mm;
+    margin-top:2.3mm;
+    font-size:9.5px;
+    font-weight:700;
+    line-height:1.1;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>كشف السلامة اليومي</h1>
+      <p>نموذج بسيط للجوال واللابتوب: اختيارات + طباعة صفحة واحدة</p>
+    </div>
+    <button id="printBtn" class="top-print">طباعة</button>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>البيانات العامة</h2>
+      <div class="form-grid">
+        <label><span>اسم الفندق</span><input id="hotel" type="text" placeholder="مثال: فندق واحة النزيل" /></label>
+        <label><span>التاريخ</span><input id="date" type="date" /></label>
+        <label><span>اليوم</span><input id="day" type="text" readonly /></label>
+        <label><span>اسم المفتش</span><input id="inspector" type="text" placeholder="اسم المفتش" /></label>
+        <label><span>وقت بداية الجولة</span><input id="startTime" type="time" /></label>
+        <label><span>وقت نهاية الجولة</span><input id="endTime" type="time" /></label>
+        <div>
+          <span class="label-title">الشفت</span>
+          <div class="chips">
+            <label><input type="radio" name="shift" value="صباحي"><b>صباحي</b></label>
+            <label><input type="radio" name="shift" value="مسائي"><b>مسائي</b></label>
+            <label><input type="radio" name="shift" value="ليلي"><b>ليلي</b></label>
+          </div>
+        </div>
+        <label><span>توقيع المسؤول المناوب</span><input id="supervisor" type="text" placeholder="اسم / توقيع" /></label>
+      </div>
+    </section>
+
+    <section class="summary-card">
+      <div><strong id="okCount">0</strong><span>يعمل</span></div>
+      <div><strong id="maintCount">0</strong><span>يحتاج صيانة</span></div>
+      <div><strong id="badCount">0</strong><span>متعطل</span></div>
+      <div><strong id="criticalCount">0</strong><span>حرجة</span></div>
+    </section>
+
+    <section id="checklist"></section>
+  </main>
+
+  <nav class="bottom-actions">
+    <button id="saveBtn" class="primary">حفظ</button>
+    <button id="clearBtn" class="ghost">مسح</button>
+    <button id="printBtn2" class="primary outline">طباعة</button>
+  </nav>
+
+  <section id="printArea" class="print-area">
+    <div class="paper">
+      <div class="paper-head">
+        <div class="logo-mark">HSE</div>
+        <h1>كشف يومي لأنظمة السلامة في الفندق</h1>
+      </div>
+
+      <div id="printInfo" class="print-info"></div>
+
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>م</th>
+            <th>النظام / العنصر</th>
+            <th>الموقع</th>
+            <th>يعمل</th>
+            <th>يحتاج صيانة</th>
+            <th>متعطل</th>
+            <th>منخفضة</th>
+            <th>متوسطة</th>
+            <th>عالية</th>
+            <th>حرجة</th>
+            <th>الملاحظة</th>
+          </tr>
+        </thead>
+        <tbody id="printRows"></tbody>
+      </table>
+
+      <div class="signatures">
+        <div>توقيع المفتش: ........................................</div>
+        <div>توقيع المسؤول المناوب: ........................................</div>
+        <div>التاريخ: ....... / ....... / ........ م</div>
+      </div>
+    </div>
+  </section>
+  <script>
+const items = [
+"لوحة التحكم الرئيسية + الطابعة",
+"غرفة مضخات الحريق",
+"غرفة المولد الاحتياطي",
+"نظام الدفع والشفط بالبدرومات",
+"التخزين بالبدرومات",
+"طفايات الحريق",
+"كاشف الدخان + كاشف الحرارة",
+"نظام الإخماد FM200",
+"اللوحات الإرشادية والإضاءات التحذيرية",
+"نظام الإخماد الرغوي FOAM",
+"نظام الرش الآلي",
+"غرفة خزان الديزل",
+"المصاعد",
+"عوائق أمام صناديق الإطفاء",
+"إنارة الطوارئ",
+"عوائق في سلم الطوارئ",
+"أبواب ومخارج الطوارئ",
+"التخزين في الغرف الكهربائية والميكانيكية",
+"مخارج الطوارئ مفتوحة وغير مقفلة",
+"طفايات الحريق ضغطها سليم ومسمار الأمان موجود",
+"خراطيم الحريق وصناديق الإطفاء بحالة جيدة",
+"لوحة الإنذار لا تظهر Fault / Trouble",
+"مسارات الهروب خالية من العوائق",
+"أبواب الحريق تغلق تلقائيًا",
+"لا يوجد تخزين عشوائي في الممرات",
+"لا توجد أسلاك كهربائية مكشوفة أو تمديدات عشوائية",
+"المولد / مضخة الحريق جاهزة للتشغيل",
+"النظافة حول غرف الكهرباء والمضخات جيدة",
+"خطة الإخلاء ومسارات الهروب معلقة ومحدثة",
+"خرائط الإخلاء موجودة داخل الغرف والأدوار",
+"نقطة التجمع واضحة وخالية من العوائق"
+];
+
+const days = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const $ = id => document.getElementById(id);
+
+function todayISO(){
+  const d = new Date();
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().slice(0,10);
+}
+function getRadio(name){
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : "";
+}
+function setRadio(name,value){
+  if(!value) return;
+  const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
+  if(el) el.checked = true;
+}
+function renderChecklist(){
+  $("checklist").innerHTML = items.map((text,index)=>{
+    const n = index + 1;
+    return `<article class="item">
+      <h3><span class="num">${n}</span><span>${text}</span></h3>
+      <div class="group-title">الحالة</div>
+      <div class="options">
+        <label><input type="radio" name="status_${n}" value="يعمل"><b>يعمل</b></label>
+        <label><input type="radio" name="status_${n}" value="يحتاج صيانة"><b>يحتاج صيانة</b></label>
+        <label><input type="radio" name="status_${n}" value="متعطل"><b>متعطل</b></label>
+      </div>
+      <div class="group-title">درجة الخطورة</div>
+      <div class="options sev">
+        <label><input type="radio" name="severity_${n}" value="منخفضة"><b>منخفضة</b></label>
+        <label><input type="radio" name="severity_${n}" value="متوسطة"><b>متوسطة</b></label>
+        <label><input type="radio" name="severity_${n}" value="عالية"><b>عالية</b></label>
+        <label><input type="radio" name="severity_${n}" value="حرجة"><b>حرجة</b></label>
+      </div>
+      <div class="mini-grid">
+        <label><span>الموقع</span><input id="location_${n}" type="text" placeholder="مثال: الدور الثاني"></label>
+        <label><span>الملاحظة</span><textarea id="note_${n}" placeholder="اكتب الملاحظة عند الحاجة"></textarea></label>
+      </div>
+    </article>`;
+  }).join("");
+}
+function updateDay(){
+  if(!$("date").value) return;
+  const d = new Date($("date").value + "T12:00:00");
+  $("day").value = days[d.getDay()];
+}
+function collect(){
+  const data = {
+    hotel:$("hotel").value,
+    date:$("date").value,
+    day:$("day").value,
+    inspector:$("inspector").value,
+    startTime:$("startTime").value,
+    endTime:$("endTime").value,
+    shift:getRadio("shift"),
+    supervisor:$("supervisor").value,
+    rows:[]
+  };
+  items.forEach((item,i)=>{
+    const n = i + 1;
+    data.rows.push({
+      n, item,
+      status:getRadio(`status_${n}`),
+      severity:getRadio(`severity_${n}`),
+      location:$(`location_${n}`).value,
+      note:$(`note_${n}`).value
+    });
+  });
+  return data;
+}
+function save(){
+  localStorage.setItem("hse_daily_check_print_v3", JSON.stringify(collect()));
+  alert("تم الحفظ على هذا الجهاز.");
+}
+function load(){
+  const raw = localStorage.getItem("hse_daily_check_print_v3");
+  if(!raw) return;
+  try{
+    const data = JSON.parse(raw);
+    ["hotel","date","day","inspector","startTime","endTime","supervisor"].forEach(id=>{
+      if(data[id] !== undefined) $(id).value = data[id];
+    });
+    setRadio("shift", data.shift);
+    if(Array.isArray(data.rows)){
+      data.rows.forEach(row=>{
+        setRadio(`status_${row.n}`, row.status);
+        setRadio(`severity_${row.n}`, row.severity);
+        if($(`location_${row.n}`)) $(`location_${row.n}`).value = row.location || "";
+        if($(`note_${row.n}`)) $(`note_${row.n}`).value = row.note || "";
+      });
+    }
+  }catch(e){}
+}
+function clearAll(){
+  if(confirm("هل تريد مسح البيانات؟")){
+    localStorage.removeItem("hse_daily_check_print_v3");
+    location.reload();
+  }
+}
+function summary(){
+  let ok=0, maint=0, bad=0, critical=0;
+  items.forEach((_,i)=>{
+    const n = i + 1;
+    const status = getRadio(`status_${n}`);
+    const severity = getRadio(`severity_${n}`);
+    if(status === "يعمل") ok++;
+    if(status === "يحتاج صيانة") maint++;
+    if(status === "متعطل") bad++;
+    if(severity === "حرجة") critical++;
+  });
+  $("okCount").textContent = ok;
+  $("maintCount").textContent = maint;
+  $("badCount").textContent = bad;
+  $("criticalCount").textContent = critical;
+}
+function esc(x){
+  return String(x || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function preparePrint(){
+  const data = collect();
+  $("printInfo").innerHTML = `
+    <div>اسم الفندق: ${esc(data.hotel)}</div>
+    <div>التاريخ: ${esc(data.date)}</div>
+    <div>اليوم: ${esc(data.day)}</div>
+    <div>الشفت: ${esc(data.shift)}</div>
+    <div>اسم المفتش: ${esc(data.inspector)}</div>
+    <div>وقت بداية الجولة: ${esc(data.startTime)}</div>
+    <div>وقت نهاية الجولة: ${esc(data.endTime)}</div>
+    <div>المسؤول المناوب: ${esc(data.supervisor)}</div>`;
+  $("printRows").innerHTML = data.rows.map(r=>{
+    return `<tr>
+      <td class="center">${r.n}</td>
+      <td>${esc(r.item)}</td>
+      <td>${esc(r.location)}</td>
+      <td class="center">${r.status === "يعمل" ? "✓" : ""}</td>
+      <td class="center">${r.status === "يحتاج صيانة" ? "✓" : ""}</td>
+      <td class="center">${r.status === "متعطل" ? "✓" : ""}</td>
+      <td class="center">${r.severity === "منخفضة" ? "✓" : ""}</td>
+      <td class="center">${r.severity === "متوسطة" ? "✓" : ""}</td>
+      <td class="center">${r.severity === "عالية" ? "✓" : ""}</td>
+      <td class="center">${r.severity === "حرجة" ? "✓" : ""}</td>
+      <td>${esc(r.note)}</td>
+    </tr>`;
+  }).join("");
+}
+
+renderChecklist();
+$("date").value = todayISO();
+updateDay();
+load();
+summary();
+$("date").addEventListener("change", updateDay);
+document.body.addEventListener("change", summary);
+$("saveBtn").addEventListener("click", save);
+$("clearBtn").addEventListener("click", clearAll);
+$("printBtn").addEventListener("click", () => window.print());
+$("printBtn2").addEventListener("click", () => window.print());
+window.addEventListener("beforeprint", preparePrint);
+
+  </script>
+</body>
+</html>
