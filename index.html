@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f5132" />
-  <title>كشف السلامة اليومي</title>
+  <title>كشف السلامة اليومي - نسخة موسعة</title>
   <style>
 *{box-sizing:border-box}
 :root{
@@ -71,6 +71,13 @@ input[value="متوسطة"]:checked+b{background:#fff8e8;color:#765000;border-co
 input[value="عالية"]:checked+b{background:#fff0e2;color:#7b3b00;border-color:#d77923}
 input[value="حرجة"]:checked+b{background:#fdeceb;color:#8a1f11;border-color:#c54d42}
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.site-rights{
+  text-align:center;
+  color:#69737b;
+  font-size:13px;
+  font-weight:800;
+  padding:14px 10px 30px;
+}
 .bottom-actions{
   position:fixed; right:0; left:0; bottom:0; display:flex; gap:8px;
   padding:10px 12px calc(10px + env(safe-area-inset-bottom));
@@ -91,10 +98,10 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
   .top-print{display:none}
 }
 
-/* طباعة صفحة واحدة: خط أكبر لكن بدون تمديد الورقة */
+/* طباعة صفحة واحدة مع استغلال كامل ارتفاع A4 */
 @page{
   size:A4 landscape;
-  margin:4mm;
+  margin:3mm;
 }
 @media print{
   html,body{
@@ -114,15 +121,20 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
   }
   .paper{
     width:100%;
-    border:1.5px solid #000;
-    padding:3.2mm 4.2mm 3mm;
+    height:204mm;
+    border:none;
+    padding:2.2mm 2.8mm 2mm;
     background:#fff;
+    display:flex;
+    flex-direction:column;
     break-inside:avoid;
     page-break-inside:avoid;
+    overflow:hidden;
   }
   .paper-head{
     position:relative;
-    height:12mm;
+    height:11mm;
+    min-height:11mm;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -143,7 +155,7 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
     letter-spacing:1.5px;
   }
   .print-area h1{
-    margin:5.5mm 0 0;
+    margin:5mm 0 0;
     text-align:center;
     text-decoration:underline;
     font-size:16px;
@@ -155,16 +167,18 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
     grid-template-columns:repeat(4,1fr);
     gap:0;
     border:1px solid #000;
-    margin-bottom:1.6mm;
+    margin-bottom:1.4mm;
     font-size:9.5px;
     font-weight:700;
+    flex:0 0 auto;
   }
   .print-info div{
-    min-height:5.2mm;
+    height:5.2mm;
     border-inline-start:1px solid #000;
     border-bottom:1px solid #000;
     padding:.8mm 1.4mm;
     line-height:1.15;
+    overflow:hidden;
   }
   .print-info div:nth-child(4n){border-inline-start:0}
   .print-info div:nth-last-child(-n+4){border-bottom:0}
@@ -172,16 +186,19 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
     width:100%;
     border-collapse:collapse;
     table-layout:fixed;
-    font-size:8.9px;
+    font-size:9.4px;
     border:1.25px solid #000;
+    flex:1 1 auto;
   }
+  .print-table thead tr{height:5.4mm}
+  .print-table tbody tr{height:5.35mm}
   .print-table th,.print-table td{
     border:1px solid #000;
-    padding:.62mm .75mm;
+    padding:.55mm .75mm;
     vertical-align:middle;
     word-break:normal;
     overflow-wrap:anywhere;
-    line-height:1.05;
+    line-height:1.08;
   }
   .print-table th{
     font-weight:900;
@@ -192,11 +209,11 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
   .print-table td.center{
     text-align:center;
     font-weight:900;
-    font-size:10px;
+    font-size:10.2px;
     line-height:1;
   }
   .print-table th:nth-child(1),.print-table td:nth-child(1){width:3.2%}
-  .print-table th:nth-child(2),.print-table td:nth-child(2){width:25.6%}
+  .print-table th:nth-child(2),.print-table td:nth-child(2){width:28.2%}
   .print-table th:nth-child(3),.print-table td:nth-child(3){width:8.8%}
   .print-table th:nth-child(4),.print-table td:nth-child(4){width:5.6%}
   .print-table th:nth-child(5),.print-table td:nth-child(5){width:7.0%}
@@ -205,25 +222,33 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
   .print-table th:nth-child(8),.print-table td:nth-child(8){width:5.7%}
   .print-table th:nth-child(9),.print-table td:nth-child(9){width:5.7%}
   .print-table th:nth-child(10),.print-table td:nth-child(10){width:5.7%}
-  .print-table th:nth-child(11),.print-table td:nth-child(11){width:21.4%}
+  .print-table th:nth-child(11),.print-table td:nth-child(11){width:18.8%}
   .signatures{
     display:grid;
     grid-template-columns:1fr 1fr 1fr;
     gap:7mm;
-    margin-top:2.3mm;
+    margin-top:1.7mm;
     font-size:9.5px;
     font-weight:700;
     line-height:1.1;
+    flex:0 0 auto;
+  }
+  .print-rights{
+    text-align:center;
+    font-size:8.5px;
+    font-weight:800;
+    margin-top:1.1mm;
+    color:#000;
+    flex:0 0 auto;
   }
 }
-
   </style>
 </head>
 <body>
   <header class="topbar">
     <div>
       <h1>كشف السلامة اليومي</h1>
-      <p>نموذج بسيط للجوال واللابتوب: اختيارات + طباعة صفحة واحدة</p>
+      <p>إعداد: نهار سعود هاجد الحربي — أخصائي صحة وسلامة مهنية</p>
     </div>
     <button id="printBtn" class="top-print">طباعة</button>
   </header>
@@ -258,6 +283,10 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
     </section>
 
     <section id="checklist"></section>
+
+    <footer class="site-rights">
+      © 2026 نهار سعود هاجد الحربي — أخصائي صحة وسلامة مهنية — HSE Daily Check — جميع الحقوق محفوظة
+    </footer>
   </main>
 
   <nav class="bottom-actions">
@@ -299,41 +328,40 @@ button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;c
         <div>توقيع المسؤول المناوب: ........................................</div>
         <div>التاريخ: ....... / ....... / ........ م</div>
       </div>
+      <div class="print-rights">© 2026 نهار سعود هاجد الحربي — أخصائي صحة وسلامة مهنية — HSE Daily Check — جميع الحقوق محفوظة</div>
     </div>
   </section>
+
   <script>
 const items = [
-"لوحة التحكم الرئيسية + الطابعة",
-"غرفة مضخات الحريق",
-"غرفة المولد الاحتياطي",
-"نظام الدفع والشفط بالبدرومات",
-"التخزين بالبدرومات",
-"طفايات الحريق",
-"كاشف الدخان + كاشف الحرارة",
-"نظام الإخماد FM200",
-"اللوحات الإرشادية والإضاءات التحذيرية",
-"نظام الإخماد الرغوي FOAM",
-"نظام الرش الآلي",
-"غرفة خزان الديزل",
-"المصاعد",
-"عوائق أمام صناديق الإطفاء",
-"إنارة الطوارئ",
-"عوائق في سلم الطوارئ",
-"أبواب ومخارج الطوارئ",
-"التخزين في الغرف الكهربائية والميكانيكية",
-"مخارج الطوارئ مفتوحة وغير مقفلة",
-"طفايات الحريق ضغطها سليم ومسمار الأمان موجود",
-"خراطيم الحريق وصناديق الإطفاء بحالة جيدة",
-"لوحة الإنذار لا تظهر Fault / Trouble",
-"مسارات الهروب خالية من العوائق",
-"أبواب الحريق تغلق تلقائيًا",
-"لا يوجد تخزين عشوائي في الممرات",
-"لا توجد أسلاك كهربائية مكشوفة أو تمديدات عشوائية",
-"المولد / مضخة الحريق جاهزة للتشغيل",
-"النظافة حول غرف الكهرباء والمضخات جيدة",
-"خطة الإخلاء ومسارات الهروب معلقة ومحدثة",
-"خرائط الإخلاء موجودة داخل الغرف والأدوار",
-"نقطة التجمع واضحة وخالية من العوائق"
+  "لوحة الإنذار الرئيسية + الطابعة بحالة Normal ولا توجد Fault / Trouble",
+  "غرفة مضخات الحريق جاهزة والوصول إليها سهل",
+  "غرفة المولد الاحتياطي جاهزة والوصول إليها سهل",
+  "نظام الضغط والشفط بالبدرومات يعمل",
+  "التخزين بالبدرومات منظم وآمن",
+  "طفايات الحريق موجودة ومثبتة وضغطها سليم ومسمار الأمان موجود",
+  "كواشف الدخان والحرارة غير مغطاة وبحالة سليمة",
+  "نظام الإخماد FM200 بحالة سليمة",
+  "اللوحات الإرشادية وإضاءات المخارج واضحة ومضاءة",
+  "نظام الإخماد الرغوي FOAM بحالة سليمة",
+  "نظام الرش الآلي بحالة سليمة",
+  "غرفة خزان الديزل آمنة وخالية من التسرب",
+  "المصاعد تعمل ولا توجد ملاحظات سلامة ظاهرة",
+  "صناديق وخراطيم الإطفاء بحالة جيدة وغير محجوبة",
+  "إنارة الطوارئ تعمل في الممرات والسلالم والمخارج",
+  "سلالم الطوارئ خالية من العوائق ونظيفة",
+  "أبواب ومخارج الطوارئ مفتوحة وغير مقفلة وتغلق تلقائيًا",
+  "الغرف الكهربائية والميكانيكية خالية من التخزين العشوائي",
+  "لا يوجد تخزين عشوائي في الممرات ومسارات الهروب",
+  "لا توجد أسلاك كهربائية مكشوفة أو تمديدات عشوائية",
+  "النظافة حول غرف الكهرباء والمضخات والمولد جيدة",
+  "خطة الإخلاء ومسارات الهروب معلقة ومحدثة",
+  "خرائط الإخلاء موجودة داخل الغرف والأدوار",
+  "نقطة التجمع واضحة وخالية من العوائق",
+  "أرقام الطوارئ وتعليمات التصرف معلقة وواضحة",
+  "حقيبة الإسعافات الأولية موجودة ومكتملة",
+  "لا توجد تسربات مياه قرب مصادر الكهرباء",
+  "المواد الكيميائية والمنظفات مخزنة بطريقة آمنة"
 ];
 
 const days = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
@@ -409,11 +437,11 @@ function collect(){
   return data;
 }
 function save(){
-  localStorage.setItem("hse_daily_check_print_v3", JSON.stringify(collect()));
+  localStorage.setItem("hse_daily_check_final_rights_v2", JSON.stringify(collect()));
   alert("تم الحفظ على هذا الجهاز.");
 }
 function load(){
-  const raw = localStorage.getItem("hse_daily_check_print_v3");
+  const raw = localStorage.getItem("hse_daily_check_final_rights_v2");
   if(!raw) return;
   try{
     const data = JSON.parse(raw);
@@ -433,7 +461,7 @@ function load(){
 }
 function clearAll(){
   if(confirm("هل تريد مسح البيانات؟")){
-    localStorage.removeItem("hse_daily_check_print_v3");
+    localStorage.removeItem("hse_daily_check_final_rights_v2");
     location.reload();
   }
 }
@@ -496,7 +524,6 @@ $("clearBtn").addEventListener("click", clearAll);
 $("printBtn").addEventListener("click", () => window.print());
 $("printBtn2").addEventListener("click", () => window.print());
 window.addEventListener("beforeprint", preparePrint);
-
   </script>
 </body>
 </html>
