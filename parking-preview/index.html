@@ -1,427 +1,503 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#122844">
-
-<title>نظام مواقف ديار المدينة</title>
-
-<style>
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:linear-gradient(#07101d,#0d1b2d);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
-  color:#fff;
-}
-
-.wrap{
-  max-width:760px;
-  margin:auto;
-  padding:16px;
-}
-
-.panel{
-  background:#10213a;
-  border:1px solid #405978;
-  border-radius:20px;
-  padding:16px;
-  margin-bottom:14px;
-}
-
-.title{
-  font-size:26px;
-  font-weight:900;
-}
-
-.sub{
-  color:#b8c4d6;
-  margin-top:5px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
-
-.spot{
-  border:1px solid #476281;
-  border-radius:14px;
-  background:#152844;
-  padding:12px;
-  text-align:center;
-  cursor:pointer;
-}
-
-.spot b{
-  font-size:22px;
-  display:block;
-}
-
-.spot small{
-  color:#b8c4d6;
-}
-
-.spot.sel{
-  outline:2px solid #8ebcff;
-}
-
-.spot.occ{
-  background:#3e2430;
-}
-
-.spot.res{
-  background:#4b3f19;
-}
-
-.spot.maint{
-  background:#303744;
-}
-
-.floor{
-  font-weight:800;
-  margin:12px 0 8px;
-}
-
-.form{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.field label{
-  display:block;
-  color:#b8c4d6;
-  font-size:13px;
-  margin-bottom:5px;
-}
-
-.field input,
-.field select,
-.field textarea{
-  width:100%;
-  background:#152844;
-  color:#fff;
-  border:1px solid #476281;
-  border-radius:10px;
-  padding:10px;
-}
-
-.field textarea{
-  min-height:70px;
-}
-
-.wide{
-  grid-column:1/-1;
-}
-
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.btn{
-  border:0;
-  border-radius:11px;
-  padding:11px 14px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.primary,
-.print{
-  background:#2b74ce;
-  color:#fff;
-}
-
-.secondary{
-  background:#273c58;
-  color:#fff;
-}
-
-.danger{
-  background:#66323a;
-  color:#fff;
-}
-
-.toggle{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  margin-bottom:10px;
-}
-
-/* =========================
-   تصريح الموقف
-   ========================= */
-
-.permit{
-  background:#fff;
-  color:#122844;
-  border-radius:24px;
-  padding:22px;
-  box-shadow:0 16px 40px #0004;
-  margin-top:12px;
-}
-
-.permit-head{
-  background:#122844;
-  border-radius:15px;
-  padding:14px 16px;
-
-  display:grid;
-  grid-template-columns:125px 1fr 66px;
-  align-items:center;
-  gap:12px;
-
-  direction:ltr;
-  min-height:150px;
-}
-
-/* الشعار */
-.logo-box{
-  width:120px;
-  height:130px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-.logo{
-  width:115px;
-  height:125px;
-  display:block;
-  object-fit:contain;
-  object-position:center;
-  image-rendering:auto;
-}
-
-.copy{
-  direction:rtl;
-  text-align:center;
-  color:#fff;
-}
-
-.copy h1{
-  font-size:32px;
-  margin:0;
-  font-weight:900;
-}
-
-.copy div{
-  direction:ltr;
-  font-size:16px;
-  margin-top:5px;
-}
-
-.pbox{
-  width:62px;
-  height:62px;
-  border-radius:10px;
-  background:#2b74ce;
-
-  display:grid;
-  place-items:center;
-
-  font-size:38px;
-  font-weight:900;
-}
-
-.permit-spot{
-  margin-top:16px;
-  border:1px solid #d9e2ee;
-  background:#f8fbff;
-  border-radius:14px;
-  padding:16px;
-}
-
-.spot-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-}
-
-.num{
-  font-size:72px;
-  font-weight:900;
-  line-height:1;
-}
-
-.floorname{
-  font-weight:800;
-  color:#2675cf;
-  font-size:20px;
-}
-
-.plate{
-  margin-top:12px;
-  padding-top:12px;
-  border-top:1px solid #dbe3ed;
-  font-weight:700;
-}
-
-.prow{
-  display:flex;
-  justify-content:space-between;
-  gap:16px;
-  border-bottom:1px solid #dbe3ed;
-  padding:13px 0;
-}
-
-.msg{
-  text-align:center;
-  font-weight:800;
-  margin-top:20px;
-  font-size:18px;
-}
-
-.print{
-  margin-top:18px;
-  border-radius:12px;
-  padding:14px;
-  text-align:center;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.mini{
-  font-size:12px;
-  color:#71849d;
-  margin-top:8px;
-  word-break:break-all;
-}
-
-.plates-list{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:10px;
-}
-
-.plates-list input{
-  width:100%;
-  background:#152844;
-  color:#fff;
-  border:1px solid #476281;
-  border-radius:10px;
-  padding:10px;
-}
-
-/* الجوال */
-@media(max-width:560px){
-
-  .grid{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .form{
-    grid-template-columns:1fr;
-  }
-
-  .wide{
-    grid-column:auto;
-  }
-
-  .permit{
-    padding:14px;
-  }
-
-  .permit-head{
-    grid-template-columns:92px 1fr 54px;
-    min-height:122px;
-    padding:10px;
-  }
-
-  .logo-box{
-    width:90px;
-    height:104px;
-  }
-
-  .logo{
-    width:88px;
-    height:102px;
-  }
-
-  .copy h1{
-    font-size:27px;
-  }
-
-  .copy div{
-    font-size:14px;
-  }
-
-  .pbox{
-    width:52px;
-    height:52px;
-    font-size:32px;
-  }
-
-  .num{
-    font-size:62px;
-  }
-
-  .plates-list{
-    grid-template-columns:1fr;
-  }
-}
-
-/* الطباعة */
-@media print{
-
-  body{
-    background:#fff;
-  }
-
-  .panel:not(.permitWrap){
-    display:none;
-  }
-
-  .wrap{
-    padding:0;
-  }
-
-  .permit{
-    box-shadow:none;
-    margin:0;
-  }
-}
-</style>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#122844">
+
+  <title>نظام مواقف ديار المدينة</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(#07101d, #0d1b2d);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Tahoma,
+        Arial,
+        sans-serif;
+      color: #fff;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    .panel {
+      background: #10213a;
+      border: 1px solid #405978;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .sub {
+      color: #b8c4d6;
+      margin-top: 5px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .spot {
+      border: 1px solid #476281;
+      border-radius: 14px;
+      background: #152844;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .spot:hover {
+      transform: translateY(-1px);
+    }
+
+    .spot b {
+      font-size: 22px;
+      display: block;
+    }
+
+    .spot small {
+      color: #b8c4d6;
+    }
+
+    .spot.sel {
+      outline: 2px solid #8ebcff;
+    }
+
+    .spot.occ {
+      background: #3e2430;
+    }
+
+    .spot.res {
+      background: #4b3f19;
+    }
+
+    .spot.maint {
+      background: #303744;
+    }
+
+    .spot.problem {
+      background: #552b2b;
+    }
+
+    .floor {
+      font-weight: 800;
+      margin: 12px 0 8px;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field label {
+      display: block;
+      color: #b8c4d6;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: #152844;
+      color: #fff;
+      border: 1px solid #476281;
+      border-radius: 10px;
+      padding: 10px;
+      font: inherit;
+    }
+
+    .field textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .primary {
+      background: #2b74ce;
+      color: #fff;
+    }
+
+    .secondary {
+      background: #273c58;
+      color: #fff;
+    }
+
+    .danger {
+      background: #66323a;
+      color: #fff;
+    }
+
+    .mini {
+      font-size: 12px;
+      color: #71849d;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .plates-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .plates-list input {
+      width: 100%;
+      background: #152844;
+      color: #fff;
+      border: 1px solid #476281;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    /* ===========================
+       تصريح الموقف
+    =========================== */
+
+    .permit {
+      background: #fff;
+      color: #122844;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 16px 40px #0004;
+      margin-top: 12px;
+    }
+
+    .permit-head {
+      background: #122844;
+      border-radius: 15px;
+      padding: 14px 16px;
+
+      display: grid;
+      grid-template-columns: 125px 1fr 66px;
+      align-items: center;
+      gap: 12px;
+
+      direction: ltr;
+      min-height: 150px;
+    }
+
+    /* الشعار الشفاف */
+    .logo-box {
+      width: 120px;
+      height: 130px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      overflow: visible;
+      background: transparent;
+    }
+
+    .logo {
+      width: 115px;
+      height: 125px;
+
+      display: block;
+
+      object-fit: contain;
+      object-position: center;
+
+      background: transparent;
+    }
+
+    .copy {
+      direction: rtl;
+      text-align: center;
+      color: #fff;
+    }
+
+    .copy h1 {
+      font-size: 32px;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .copy div {
+      direction: ltr;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    .pbox {
+      width: 62px;
+      height: 62px;
+
+      border-radius: 10px;
+
+      background: #2b74ce;
+
+      display: grid;
+      place-items: center;
+
+      color: #122844;
+      font-size: 38px;
+      font-weight: 900;
+    }
+
+    .permit-spot {
+      margin-top: 16px;
+      border: 1px solid #d9e2ee;
+      background: #f8fbff;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .spot-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .num {
+      font-size: 72px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .floorname {
+      font-weight: 800;
+      color: #2675cf;
+      font-size: 20px;
+    }
+
+    .plate {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #dbe3ed;
+      font-weight: 700;
+    }
+
+    .prow {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+
+      border-bottom: 1px solid #dbe3ed;
+      padding: 13px 0;
+    }
+
+    .msg {
+      text-align: center;
+      font-weight: 800;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .print {
+      margin-top: 18px;
+      border-radius: 12px;
+      padding: 14px;
+
+      background: #2b74ce;
+      color: #fff;
+
+      text-align: center;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* ===========================
+       الجوال
+    =========================== */
+
+    @media (max-width: 560px) {
+
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .form {
+        grid-template-columns: 1fr;
+      }
+
+      .wide {
+        grid-column: auto;
+      }
+
+      .permit {
+        padding: 14px;
+      }
+
+      .permit-head {
+        grid-template-columns: 92px 1fr 54px;
+        min-height: 122px;
+        padding: 10px;
+        gap: 8px;
+      }
+
+      .logo-box {
+        width: 90px;
+        height: 104px;
+      }
+
+      .logo {
+        width: 88px;
+        height: 102px;
+      }
+
+      .copy h1 {
+        font-size: 27px;
+      }
+
+      .copy div {
+        font-size: 14px;
+      }
+
+      .pbox {
+        width: 52px;
+        height: 52px;
+        font-size: 32px;
+      }
+
+      .num {
+        font-size: 62px;
+      }
+
+      .plates-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===========================
+       الطباعة
+    =========================== */
+
+    @media print {
+
+      body {
+        background: #fff;
+      }
+
+      .panel:not(.permitWrap) {
+        display: none !important;
+      }
+
+      .wrap {
+        max-width: none;
+        padding: 0;
+      }
+
+      .permit {
+        box-shadow: none;
+        margin: 0;
+      }
+
+      .print {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="wrap">
 
-  <div class="panel permitWrap" id="guestView" style="display:none"></div>
+  <!-- صفحة النزيل -->
+  <div
+    class="panel permitWrap"
+    id="guestView"
+    style="display:none"
+  ></div>
 
+  <!-- صفحة الموظف -->
   <div id="staffView">
 
     <div class="panel">
-      <div class="title">نظام إدارة مواقف الفندق</div>
+
+      <div class="title">
+        نظام إدارة مواقف الفندق
+      </div>
+
       <div class="sub">
         20 موقف — B1 و B2 — المواقف 01 و12 مخصصة ♿
       </div>
+
     </div>
 
     <div class="panel">
 
       <label class="toggle">
+
         <input type="checkbox" id="multi">
+
         حجز عدة مواقف لنفس النزيل
+
       </label>
 
-      <div class="floor">B1 — 11 مواقف</div>
-      <div class="grid" id="b1"></div>
+      <div class="floor">
+        B1 — 11 مواقف
+      </div>
 
-      <div class="floor">B2 — 9 مواقف</div>
-      <div class="grid" id="b2"></div>
+      <div
+        class="grid"
+        id="b1"
+      ></div>
+
+      <div class="floor">
+        B2 — 9 مواقف
+      </div>
+
+      <div
+        class="grid"
+        id="b2"
+      ></div>
 
     </div>
 
@@ -430,374 +506,714 @@ body{
       <div class="form">
 
         <div class="field">
-          <label>رقم الغرفة</label>
-          <input id="room" value="204">
+
+          <label>
+            رقم الغرفة
+          </label>
+
+          <input
+            id="room"
+            value="204"
+          >
+
         </div>
 
         <div class="field">
-          <label>لوحة السيارة</label>
-          <input id="plate" value="أ ب ج 1234">
+
+          <label>
+            لوحة السيارة
+          </label>
+
+          <input
+            id="plate"
+            value="أ ب ج 1234"
+          >
+
         </div>
 
         <div class="field">
-          <label>صالح من</label>
-          <input id="start" type="datetime-local">
+
+          <label>
+            صالح من
+          </label>
+
+          <input
+            id="start"
+            type="datetime-local"
+          >
+
         </div>
 
         <div class="field">
-          <label>صالح حتى</label>
-          <input id="end" type="datetime-local">
+
+          <label>
+            صالح حتى
+          </label>
+
+          <input
+            id="end"
+            type="datetime-local"
+          >
+
         </div>
 
         <div class="field">
-          <label>المبلغ</label>
-          <input id="amount" type="number" value="50">
+
+          <label>
+            المبلغ
+          </label>
+
+          <input
+            id="amount"
+            type="number"
+            value="50"
+          >
+
         </div>
 
         <div class="field">
-          <label>المدفوع</label>
-          <input id="paid" type="number" value="50">
+
+          <label>
+            المدفوع
+          </label>
+
+          <input
+            id="paid"
+            type="number"
+            value="50"
+          >
+
         </div>
 
         <div class="field">
-          <label>الحالة</label>
+
+          <label>
+            الحالة
+          </label>
 
           <select id="status">
-            <option value="occupied">مشغول</option>
-            <option value="reserved">محجوز</option>
-            <option value="maintenance">صيانة</option>
-            <option value="problem">مشكلة</option>
+
+            <option value="occupied">
+              مشغول
+            </option>
+
+            <option value="reserved">
+              محجوز
+            </option>
+
+            <option value="maintenance">
+              صيانة
+            </option>
+
+            <option value="problem">
+              مشكلة
+            </option>
+
           </select>
 
         </div>
 
         <div class="field wide">
-          <label>ملاحظات الاستقبال</label>
-          <textarea id="notes"
-            placeholder="هذه لا تظهر للحارس أو النزيل"></textarea>
+
+          <label>
+            ملاحظات الاستقبال
+          </label>
+
+          <textarea
+            id="notes"
+            placeholder="هذه لا تظهر للحارس أو النزيل"
+          ></textarea>
+
         </div>
 
       </div>
 
-      <div id="multiPlates" style="display:none">
+      <div
+        id="multiPlates"
+        style="display:none"
+      >
 
         <div class="floor">
           لوحات السيارات للمواقف المختارة
         </div>
 
-        <div class="plates-list" id="platesList"></div>
+        <div
+          class="plates-list"
+          id="platesList"
+        ></div>
 
       </div>
 
-      <div class="actions" style="margin-top:12px">
+      <div
+        class="actions"
+        style="margin-top:12px"
+      >
 
-        <button class="btn primary" onclick="previewPermit()">
+        <button
+          class="btn primary"
+          onclick="previewPermit()"
+        >
           معاينة التصريح
         </button>
 
-        <button class="btn secondary" onclick="saveBooking()">
+        <button
+          class="btn secondary"
+          onclick="saveBooking()"
+        >
           حفظ
         </button>
 
-        <button class="btn secondary" onclick="createGuestLink()">
+        <button
+          class="btn secondary"
+          onclick="createGuestLink()"
+        >
           إنشاء رابط مؤقت
         </button>
 
-        <button class="btn secondary" onclick="sharePermit()">
+        <button
+          class="btn secondary"
+          onclick="sharePermit()"
+        >
           مشاركة
         </button>
 
-        <button class="btn danger" onclick="clearForm()">
+        <button
+          class="btn danger"
+          onclick="clearForm()"
+        >
           مسح
         </button>
 
       </div>
 
-      <div class="mini" id="linkMsg"></div>
+      <div
+        class="mini"
+        id="linkMsg"
+      ></div>
 
     </div>
 
-    <div class="panel" id="permitHost"></div>
+    <div
+      class="panel"
+      id="permitHost"
+    ></div>
 
   </div>
 </div>
 
+
 <script>
 
-/* ==================================
-   صورة الشعار التي رفعتها بنفسك
-   ================================== */
+/* =====================================================
+   الشعار الشفاف
+===================================================== */
 
 const LOGO_DATA =
-'./WhatsApp%20Image%202026-09-06%20at%202.26.45%20AM.jpeg';
+  './diyar-logo-transparent.png';
 
 
-/* ==================================
-   المواقف
-   ================================== */
+/* =====================================================
+   بيانات المواقف
+===================================================== */
 
 const spots = [];
 
-for(let i = 1; i <= 20; i++){
+for (let i = 1; i <= 20; i++) {
 
   spots.push({
-    n:i,
-    f:i <= 11 ? 'B1' : 'B2',
-    accessible:i === 1 || i === 12,
-    status:'available'
+
+    n: i,
+
+    f:
+      i <= 11
+        ? 'B1'
+        : 'B2',
+
+    accessible:
+      i === 1 ||
+      i === 12,
+
+    status:
+      'available'
+
   });
 
 }
+
 
 let selected = [3];
 
-const $ = id => document.getElementById(id);
 
-const pad = n => String(n).padStart(2,'0');
+const $ =
+  id =>
+    document.getElementById(id);
 
 
-function renderSpots(){
+const pad =
+  n =>
+    String(n)
+      .padStart(2, '0');
 
-  ['B1','B2'].forEach(floor => {
 
-    const box = $(floor.toLowerCase());
+/* =====================================================
+   عرض المواقف
+===================================================== */
 
-    box.innerHTML = '';
+function renderSpots() {
 
-    spots
-    .filter(s => s.f === floor)
-    .forEach(s => {
+  ['B1', 'B2']
+    .forEach(floor => {
 
-      const d = document.createElement('div');
+      const box =
+        $(floor.toLowerCase());
 
-      d.className =
-        'spot ' +
-        (selected.includes(s.n) ? 'sel ' : '') +
-        (
-          s.status === 'occupied' ? 'occ ' :
-          s.status === 'reserved' ? 'res ' :
-          s.status === 'maintenance' ? 'maint ' :
-          ''
-        );
+      box.innerHTML = '';
 
-      let statusText = 'متاح';
+      spots
+        .filter(
+          spot =>
+            spot.f === floor
+        )
+        .forEach(spot => {
 
-      if(s.status === 'occupied') statusText = 'مشغول';
-      if(s.status === 'reserved') statusText = 'محجوز';
-      if(s.status === 'maintenance') statusText = 'صيانة';
-      if(s.status === 'problem') statusText = 'مشكلة';
+          const div =
+            document.createElement('div');
 
-      d.innerHTML = `
-        <b>
-          ${pad(s.n)}
-          ${s.accessible ? ' ♿' : ''}
-        </b>
 
-        <small>${statusText}</small>
-      `;
+          let extraClass = '';
 
-      d.onclick = () => pick(s.n);
+          if (spot.status === 'occupied') {
+            extraClass = 'occ';
+          }
 
-      box.appendChild(d);
+          else if (spot.status === 'reserved') {
+            extraClass = 'res';
+          }
+
+          else if (spot.status === 'maintenance') {
+            extraClass = 'maint';
+          }
+
+          else if (spot.status === 'problem') {
+            extraClass = 'problem';
+          }
+
+
+          div.className =
+            'spot ' +
+            (
+              selected.includes(spot.n)
+                ? 'sel '
+                : ''
+            ) +
+            extraClass;
+
+
+          let statusText =
+            'متاح';
+
+
+          if (spot.status === 'occupied') {
+            statusText = 'مشغول';
+          }
+
+          else if (spot.status === 'reserved') {
+            statusText = 'محجوز';
+          }
+
+          else if (spot.status === 'maintenance') {
+            statusText = 'صيانة';
+          }
+
+          else if (spot.status === 'problem') {
+            statusText = 'مشكلة';
+          }
+
+
+          div.innerHTML = `
+
+            <b>
+
+              ${pad(spot.n)}
+
+              ${
+                spot.accessible
+                  ? ' ♿'
+                  : ''
+              }
+
+            </b>
+
+            <small>
+              ${statusText}
+            </small>
+
+          `;
+
+
+          div.onclick =
+            () =>
+              pick(spot.n);
+
+
+          box.appendChild(div);
+
+        });
 
     });
 
-  });
+}
+
+
+/* =====================================================
+   اختيار موقف
+===================================================== */
+
+function pick(number) {
+
+  if ($('multi').checked) {
+
+    if (
+      selected.includes(number)
+    ) {
+
+      selected =
+        selected.filter(
+          value =>
+            value !== number
+        );
+
+    }
+
+    else {
+
+      selected.push(number);
+
+    }
+
+  }
+
+  else {
+
+    selected = [number];
+
+  }
+
+
+  renderSpots();
+
+  renderPlateInputs();
 
 }
 
 
-function pick(n){
+/* =====================================================
+   الحجز المتعدد
+===================================================== */
 
-  if($('multi').checked){
+$('multi').onchange =
+  () => {
 
-    if(selected.includes(n)){
-      selected = selected.filter(x => x !== n);
+    if (
+      !$('multi').checked &&
+      selected.length > 1
+    ) {
+
+      selected =
+        [selected[0]];
+
     }
-    else{
-      selected.push(n);
-    }
-
-  }
-  else{
-    selected = [n];
-  }
-
-  renderSpots();
-  renderPlateInputs();
-}
 
 
-$('multi').onchange = () => {
+    renderSpots();
 
-  if(!$('multi').checked && selected.length > 1){
-    selected = [selected[0]];
-  }
+    renderPlateInputs();
 
-  renderSpots();
-  renderPlateInputs();
-
-};
+  };
 
 
-function renderPlateInputs(){
+function renderPlateInputs() {
 
-  const box = $('multiPlates');
-  const list = $('platesList');
+  const box =
+    $('multiPlates');
 
-  if(!$('multi').checked){
+  const list =
+    $('platesList');
 
-    box.style.display = 'none';
+
+  if (
+    !$('multi').checked
+  ) {
+
+    box.style.display =
+      'none';
+
     return;
 
   }
 
-  box.style.display = 'block';
-  list.innerHTML = '';
 
-  selected.forEach((n,index) => {
+  box.style.display =
+    'block';
 
-    const input = document.createElement('input');
 
-    input.id = 'mplate' + n;
-    input.placeholder = `لوحة موقف ${pad(n)}`;
+  list.innerHTML =
+    '';
 
-    if(index === 0){
-      input.value = $('plate').value;
-    }
 
-    list.appendChild(input);
+  selected
+    .forEach(
+      (number, index) => {
 
-  });
+        const input =
+          document.createElement(
+            'input'
+          );
+
+
+        input.id =
+          'mplate' + number;
+
+
+        input.placeholder =
+          `لوحة موقف ${pad(number)}`;
+
+
+        if (index === 0) {
+
+          input.value =
+            $('plate').value;
+
+        }
+
+
+        list.appendChild(
+          input
+        );
+
+      }
+    );
 
 }
 
 
-function fmt(value){
+/* =====================================================
+   التاريخ
+===================================================== */
 
-  if(!value) return '-';
+function fmt(value) {
 
-  const d = new Date(value);
+  if (!value) {
+    return '-';
+  }
+
+
+  const date =
+    new Date(value);
+
 
   return (
-    `${pad(d.getHours())}:${pad(d.getMinutes())}` +
-    ` · ${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`
+    `${pad(date.getHours())}:` +
+    `${pad(date.getMinutes())}` +
+    ` · ` +
+    `${date.getFullYear()}/` +
+    `${pad(date.getMonth() + 1)}/` +
+    `${pad(date.getDate())}`
   );
 
 }
 
 
-function permitCode(){
+/* =====================================================
+   رقم التصريح
+===================================================== */
+
+function permitCode() {
 
   return (
     'PK-' +
-    ($('room').value || 'ROOM') +
+    (
+      $('room').value ||
+      'ROOM'
+    ) +
     '-' +
-    selected.map(pad).join('')
+    selected
+      .map(pad)
+      .join('')
   );
 
 }
 
 
-function plates(){
+/* =====================================================
+   اللوحات
+===================================================== */
 
-  if($('multi').checked){
+function plates() {
+
+  if (
+    $('multi').checked
+  ) {
 
     const result = {};
 
-    selected.forEach(n => {
 
-      result[n] =
-        $('mplate' + n)?.value || '';
+    selected.forEach(
+      number => {
 
-    });
+        result[number] =
+          $('mplate' + number)
+            ?.value ||
+          '';
+
+      }
+    );
+
 
     return result;
 
   }
 
-  return {
-    [selected[0]]:$('plate').value
-  };
-
-}
-
-
-function dataNow(){
 
   return {
 
-    room:$('room').value,
-
-    spots:[...selected],
-
-    plates:plates(),
-
-    start:$('start').value,
-
-    end:$('end').value,
-
-    code:permitCode(),
-
-    floors:Object.fromEntries(
-      selected.map(n => [
-        n,
-        spots.find(s => s.n === n).f
-      ])
-    )
+    [selected[0]]:
+      $('plate').value
 
   };
 
 }
 
 
-function permitHTML(data){
+/* =====================================================
+   جمع بيانات التصريح
+===================================================== */
 
-  const cards = data.spots.map(n => {
+function dataNow() {
 
-    const floor =
-      spots.find(s => s.n === n)?.f ||
-      data.floors?.[n] ||
-      '';
+  return {
 
-    return `
-      <div class="permit-spot">
+    room:
+      $('room').value,
 
-        <div class="spot-top">
+    spots:
+      [...selected],
 
-          <div>
+    plates:
+      plates(),
 
-            <div class="floorname">
-              ${floor} · موقف
+    start:
+      $('start').value,
+
+    end:
+      $('end').value,
+
+    code:
+      permitCode(),
+
+    floors:
+      Object.fromEntries(
+
+        selected.map(
+          number => [
+
+            number,
+
+            spots.find(
+              spot =>
+                spot.n === number
+            )?.f || ''
+
+          ]
+        )
+
+      )
+
+  };
+
+}
+
+
+/* =====================================================
+   إنشاء شكل التصريح
+===================================================== */
+
+function permitHTML(data) {
+
+  const cards =
+    data.spots
+      .map(number => {
+
+        const floor =
+          spots.find(
+            spot =>
+              spot.n === number
+          )?.f ||
+
+          data.floors?.[number] ||
+
+          '';
+
+
+        return `
+
+          <div class="permit-spot">
+
+            <div class="spot-top">
+
+              <div>
+
+                <div class="floorname">
+
+                  ${floor} · موقف
+
+                </div>
+
+                <div class="num">
+
+                  ${pad(number)}
+
+                </div>
+
+              </div>
+
+
+              <div
+                style="color:#708197"
+              >
+
+                رقم الموقف
+
+              </div>
+
             </div>
 
-            <div class="num">
-              ${pad(n)}
+
+            <div class="plate">
+
+              لوحة السيارة:
+
+              ${
+                data.plates[number] ||
+                '-'
+              }
+
             </div>
 
           </div>
 
-          <div style="color:#708197">
-            رقم الموقف
-          </div>
+        `;
 
-        </div>
-
-        <div class="plate">
-          لوحة السيارة:
-          ${data.plates[n] || '-'}
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
+      })
+      .join('');
 
 
   return `
+
     <div class="permit">
 
       <div class="permit-head">
+
 
         <div class="logo-box">
 
@@ -808,6 +1224,7 @@ function permitHTML(data){
           >
 
         </div>
+
 
         <div class="copy">
 
@@ -821,196 +1238,390 @@ function permitHTML(data){
 
         </div>
 
+
         <div class="pbox">
           P
         </div>
 
+
       </div>
+
 
       ${cards}
 
-      <div style="margin-top:16px">
+
+      <div
+        style="margin-top:16px"
+      >
+
 
         <div class="prow">
-          <span>رقم الغرفة</span>
-          <b>${data.room || '-'}</b>
+
+          <span>
+            رقم الغرفة
+          </span>
+
+          <b>
+            ${
+              data.room ||
+              '-'
+            }
+          </b>
+
         </div>
 
-        <div class="prow">
-          <span>رقم التصريح</span>
-          <b>${data.code}</b>
-        </div>
 
         <div class="prow">
-          <span>صالح من</span>
-          <b>${fmt(data.start)}</b>
+
+          <span>
+            رقم التصريح
+          </span>
+
+          <b>
+            ${data.code}
+          </b>
+
         </div>
 
+
         <div class="prow">
-          <span>صالح حتى</span>
-          <b>${fmt(data.end)}</b>
+
+          <span>
+            صالح من
+          </span>
+
+          <b>
+            ${fmt(data.start)}
+          </b>
+
         </div>
+
+
+        <div class="prow">
+
+          <span>
+            صالح حتى
+          </span>
+
+          <b>
+            ${fmt(data.end)}
+          </b>
+
+        </div>
+
 
       </div>
+
 
       <div class="msg">
+
         يرجى إبراز التصريح للحارس عند الدخول
+
       </div>
+
 
       <div
         class="print"
-        onclick="window.print()">
+        onclick="window.print()"
+      >
 
         🖨️ طباعة التصريح / حفظ PDF
 
       </div>
 
+
     </div>
+
   `;
 
 }
 
 
-function previewPermit(){
+/* =====================================================
+   معاينة التصريح
+===================================================== */
 
-  if(!selected.length){
-    alert('اختر موقفاً');
+function previewPermit() {
+
+  if (
+    !selected.length
+  ) {
+
+    alert(
+      'اختر موقفاً'
+    );
+
     return;
+
   }
 
-  $('permitHost').innerHTML =
-    permitHTML(dataNow());
+
+  $('permitHost')
+    .innerHTML =
+      permitHTML(
+        dataNow()
+      );
 
 }
 
 
-function saveBooking(){
+/* =====================================================
+   حفظ حالة الموقف
+===================================================== */
 
-  if(!selected.length){
-    alert('اختر موقفاً');
+function saveBooking() {
+
+  if (
+    !selected.length
+  ) {
+
+    alert(
+      'اختر موقفاً'
+    );
+
     return;
+
   }
 
-  selected.forEach(n => {
 
-    const spot =
-      spots.find(s => s.n === n);
+  selected
+    .forEach(number => {
 
-    spot.status =
-      $('status').value;
+      const spot =
+        spots.find(
+          value =>
+            value.n === number
+        );
 
-  });
+
+      if (spot) {
+
+        spot.status =
+          $('status').value;
+
+      }
+
+    });
+
 
   renderSpots();
+
   previewPermit();
 
 }
 
 
-function clearForm(){
+/* =====================================================
+   مسح
+===================================================== */
 
-  $('room').value = '';
-  $('plate').value = '';
-  $('notes').value = '';
+function clearForm() {
 
-  selected = [];
+  $('room').value =
+    '';
+
+  $('plate').value =
+    '';
+
+  $('notes').value =
+    '';
+
+  $('amount').value =
+    '';
+
+  $('paid').value =
+    '';
+
+
+  selected =
+    [];
+
 
   renderSpots();
 
-  $('permitHost').innerHTML = '';
+
+  $('permitHost')
+    .innerHTML =
+      '';
+
 
   renderPlateInputs();
 
 }
 
 
-/* ==================================
-   الرابط المؤقت
-   ================================== */
+/* =====================================================
+   ترميز الرابط المؤقت
+===================================================== */
 
-function encodePermit(obj){
+function encodePermit(object) {
 
   return btoa(
+
     unescape(
+
       encodeURIComponent(
-        JSON.stringify(obj)
+
+        JSON.stringify(
+          object
+        )
+
       )
+
     )
+
   )
-  .replace(/=/g,'')
-  .replace(/\+/g,'-')
-  .replace(/\//g,'_');
 
-}
+  .replace(
+    /=/g,
+    ''
+  )
 
+  .replace(
+    /\+/g,
+    '-'
+  )
 
-function decodePermit(value){
-
-  let s =
-    value
-    .replace(/-/g,'+')
-    .replace(/_/g,'/');
-
-  while(s.length % 4){
-    s += '=';
-  }
-
-  return JSON.parse(
-    decodeURIComponent(
-      escape(
-        atob(s)
-      )
-    )
+  .replace(
+    /\//g,
+    '_'
   );
 
 }
 
 
-function validDates(){
+/* =====================================================
+   فك الرابط
+===================================================== */
+
+function decodePermit(value) {
+
+  let text =
+    value
+
+      .replace(
+        /-/g,
+        '+'
+      )
+
+      .replace(
+        /_/g,
+        '/'
+      );
+
+
+  while (
+    text.length % 4
+  ) {
+
+    text += '=';
+
+  }
+
+
+  return JSON.parse(
+
+    decodeURIComponent(
+
+      escape(
+
+        atob(text)
+
+      )
+
+    )
+
+  );
+
+}
+
+
+/* =====================================================
+   التحقق من التواريخ
+===================================================== */
+
+function validDates() {
 
   const start =
-    new Date($('start').value);
+    new Date(
+      $('start').value
+    );
+
 
   const end =
-    new Date($('end').value);
+    new Date(
+      $('end').value
+    );
 
-  if(
-    !Number.isFinite(start.getTime()) ||
-    !Number.isFinite(end.getTime())
-  ){
 
-    alert('حدد تاريخ البداية والنهاية.');
+  if (
+    !Number.isFinite(
+      start.getTime()
+    ) ||
+
+    !Number.isFinite(
+      end.getTime()
+    )
+  ) {
+
+    alert(
+      'حدد تاريخ البداية والنهاية.'
+    );
+
     return false;
 
   }
 
-  if(end <= start){
 
-    alert('تاريخ المغادرة يجب أن يكون بعد تاريخ البداية.');
+  if (
+    end <= start
+  ) {
+
+    alert(
+      'تاريخ المغادرة يجب أن يكون بعد تاريخ البداية.'
+    );
+
     return false;
 
   }
 
-  if(end <= new Date()){
 
-    alert('تاريخ انتهاء التصريح يجب أن يكون في المستقبل.');
+  if (
+    end <= new Date()
+  ) {
+
+    alert(
+      'تاريخ انتهاء التصريح يجب أن يكون في المستقبل.'
+    );
+
     return false;
 
   }
+
 
   return true;
 
 }
 
 
-function createGuestLink(){
+/* =====================================================
+   إنشاء رابط النزيل
+===================================================== */
 
-  if(!validDates()){
+function createGuestLink() {
+
+  if (
+    !validDates()
+  ) {
+
     return;
+
   }
+
 
   const data =
     dataNow();
+
 
   const url =
     location.origin +
@@ -1018,70 +1629,130 @@ function createGuestLink(){
     '?permit=' +
     encodePermit(data);
 
-  $('linkMsg').textContent = url;
 
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(url);
+  $('linkMsg')
+    .textContent =
+      url;
+
+
+  if (
+    navigator.clipboard
+  ) {
+
+    navigator.clipboard
+      .writeText(url)
+      .catch(() => {});
+
   }
+
 
   return url;
 
 }
 
 
-async function sharePermit(){
+/* =====================================================
+   المشاركة
+===================================================== */
+
+async function sharePermit() {
 
   const url =
     createGuestLink();
 
-  if(!url) return;
 
-  if(navigator.share){
+  if (!url) {
+    return;
+  }
 
-    try{
+
+  if (
+    navigator.share
+  ) {
+
+    try {
 
       await navigator.share({
-        title:'تصريح موقف',
-        text:'تصريح موقف الفندق',
-        url:url
+
+        title:
+          'تصريح موقف',
+
+        text:
+          'تصريح موقف الفندق',
+
+        url:
+          url
+
       });
 
     }
-    catch(e){}
+
+    catch (error) {
+
+    }
+
+  }
+
+  else {
+
+    alert(
+      'تم نسخ رابط التصريح.'
+    );
 
   }
 
 }
 
 
-/* ==================================
-   التواريخ الافتراضية
-   ================================== */
+/* =====================================================
+   الوقت الافتراضي
+===================================================== */
 
-function initDates(){
+function initDates() {
 
   const now =
     new Date();
 
+
   const end =
     new Date(
+
       now.getTime() +
-      (3 * 24 * 60 * 60 * 1000)
+
+      (
+        3 *
+        24 *
+        60 *
+        60 *
+        1000
+      )
+
     );
 
-  const local = d => {
 
-    return new Date(
-      d.getTime() -
-      d.getTimezoneOffset() * 60000
-    )
-    .toISOString()
-    .slice(0,16);
+  const local =
+    date =>
 
-  };
+      new Date(
+
+        date.getTime() -
+
+        date.getTimezoneOffset() *
+        60000
+
+      )
+
+      .toISOString()
+
+      .slice(
+        0,
+        16
+      );
+
 
   $('start').value =
     local(now);
+
 
   $('end').value =
     local(end);
@@ -1089,68 +1760,109 @@ function initDates(){
 }
 
 
-/* ==================================
-   وضع النزيل
-   ================================== */
+/* =====================================================
+   رابط النزيل
+===================================================== */
 
-function guestMode(){
+function guestMode() {
 
   const token =
+
     new URLSearchParams(
       location.search
     )
-    .get('permit');
 
-  if(!token){
+    .get(
+      'permit'
+    );
+
+
+  if (!token) {
+
     return false;
+
   }
 
-  try{
+
+  try {
 
     const data =
-      decodePermit(token);
+      decodePermit(
+        token
+      );
+
 
     const end =
-      new Date(data.end);
+      new Date(
+        data.end
+      );
 
-    $('staffView').style.display =
-      'none';
 
-    $('guestView').style.display =
-      'block';
+    $('staffView')
+      .style.display =
+        'none';
 
-    if(end <= new Date()){
 
-      $('guestView').innerHTML = `
-        <div class="title">
-          انتهت صلاحية التصريح
-        </div>
-      `;
+    $('guestView')
+      .style.display =
+        'block';
+
+
+    if (
+      end <= new Date()
+    ) {
+
+      $('guestView')
+        .innerHTML = `
+
+          <div class="title">
+
+            انتهت صلاحية التصريح
+
+          </div>
+
+        `;
 
     }
-    else{
 
-      $('guestView').innerHTML =
-        permitHTML(data);
+    else {
+
+      $('guestView')
+        .innerHTML =
+          permitHTML(
+            data
+          );
 
     }
+
 
     return true;
 
   }
-  catch(error){
 
-    $('staffView').style.display =
-      'none';
+  catch (error) {
 
-    $('guestView').style.display =
-      'block';
+    $('staffView')
+      .style.display =
+        'none';
 
-    $('guestView').innerHTML = `
-      <div class="title">
-        رابط التصريح غير صالح
-      </div>
-    `;
+
+    $('guestView')
+      .style.display =
+        'block';
+
+
+    $('guestView')
+      .innerHTML = `
+
+        <div class="title">
+
+          رابط التصريح غير صالح
+
+        </div>
+
+      `;
+
 
     return true;
 
@@ -1159,7 +1871,9 @@ function guestMode(){
 }
 
 
-/* تشغيل الموقع */
+/* =====================================================
+   تشغيل النظام
+===================================================== */
 
 initDates();
 
@@ -1167,11 +1881,16 @@ renderSpots();
 
 renderPlateInputs();
 
-if(!guestMode()){
+if (
+  !guestMode()
+) {
+
   previewPermit();
+
 }
 
 </script>
 
 </body>
+
 </html>
