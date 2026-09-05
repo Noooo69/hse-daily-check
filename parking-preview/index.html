@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>معاينة نظام المواقف</title>
+<style>
+:root{--bg:#07101d;--panel:#172841;--panel2:#203653;--field:#152844;--line:#405978;--text:#eef4ff;--muted:#b8c4d6;--blue:#8ebcff;--green:#134a39;--greenText:#a9e8cb;--red:#542c31;--yellow:#5a481b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#07101d,#0d1b2d);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}button,input,textarea,select{font:inherit}.app{max-width:920px;margin:auto;min-height:100vh;padding:16px}.card{background:var(--panel);border:1px solid #587193;border-radius:22px;padding:18px;margin-bottom:16px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.muted{color:var(--muted)}.spots{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.spot{position:relative;background:var(--green);color:var(--greenText);border:2px solid transparent;border-radius:13px;min-height:88px;padding:9px 3px;cursor:pointer}.spot b{display:block;font-size:22px}.spot small{display:block;margin-top:10px}.spot.sel{border-color:var(--blue);box-shadow:0 0 0 3px #8ebcff44}.spot.occupied{background:var(--red);color:#ffd7d7}.spot.reserved{background:var(--yellow);color:#ffeaa3}.spot.maintenance{background:#29415f;color:#d1e3ff}.spot.problem{background:#4b3264;color:#eadbff}.wheel{position:absolute;left:7px;top:6px;font-size:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;margin:9px 0 6px;color:#dce6f4}input,textarea,select{width:100%;background:var(--field);border:1px solid var(--line);border-radius:12px;color:white;padding:13px;font-size:17px}textarea{min-height:100px}.btn{border:0;border-radius:12px;padding:14px 16px;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:#10233d}.secondary{background:#223b5b;color:white;border:1px solid #516b8c}.danger{background:#5a2a31;color:#fff}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.selectedbar{background:var(--panel2);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between}.permit{display:none;background:#fff;color:#122844;border-radius:22px;padding:22px;margin-top:16px}.permit.show{display:block}.phead{background:#122844;color:#fff;border-radius:13px;padding:18px;display:flex;align-items:center;gap:14px}.picon{background:#2b74ce;color:white;font-size:34px;font-weight:800;border-radius:9px;width:58px;height:58px;display:grid;place-items:center}.ptitle{font-size:30px;font-weight:800}.big{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;align-items:center;border:1px solid #d9e2ee;border-radius:13px;padding:14px;margin-top:14px}.num{font-size:78px;font-weight:900;text-align:center}.floor{background:#eef4fb;border-radius:12px;text-align:center;padding:14px}.floor b{font-size:42px;color:#2675cf}.rowp{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #dbe3ed;padding:11px 0}.rowp:last-child{border-bottom:0}.notice{margin-top:14px;padding:10px 12px;border:1px solid #6c84a4;border-radius:12px;color:#d6e0ef}.statusline{font-size:14px;color:#b8c4d6;margin-top:7px}.banner{padding:9px 12px;border-radius:10px;background:#0f2138;border:1px solid #38597e;margin-bottom:14px}.hidden{display:none}
+@media(max-width:560px){.app{padding:0}.card{border-radius:0;margin:0;border-left:0;border-right:0}.spots{gap:7px}.spot{min-height:80px}.spot b{font-size:19px}.grid2{grid-template-columns:1fr 1fr}.ptitle{font-size:26px}.num{font-size:62px}}
+@media(max-width:390px){.spots{gap:5px}.spot{min-height:75px;padding:8px 1px}.spot small{font-size:12px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="card">
+  <div class="top"><div><h1 style="margin:0 0 5px">إدارة المواقف والتصاريح</h1><div class="muted">معاينة تجريبية — بدون ربط قاعدة البيانات</div></div><div id="summary" class="muted"></div></div>
+</div>
+<div class="card">
+  <div class="banner">جرّب كل شيء هنا أولًا. أي بيانات تدخلها في هذه المعاينة لا تؤثر على Supabase.</div>
+  <div class="top"><h2>B1 · 11 موقفًا</h2><span id="b1c" class="muted"></span></div><div id="b1" class="spots"></div>
+  <div class="top" style="margin-top:22px"><h2>B2 · 9 مواقف</h2><span id="b2c" class="muted"></span></div><div id="b2" class="spots"></div>
+</div>
+<div class="card">
+  <div class="selectedbar"><strong id="selTitle">B1 · موقف 03</strong><span id="selStatus">متاح</span></div>
+  <div class="grid2"><div><label>رقم الغرفة</label><input id="room" placeholder="مثال 204"></div><div><label>لوحة السيارة</label><input id="plate" placeholder="مثال أ ب ج 1234"></div></div>
+  <div class="grid2"><div><label>بداية التصريح</label><input id="start" type="datetime-local"></div><div><label>المغادرة المتوقعة</label><input id="end" type="datetime-local"></div></div>
+  <div class="statusline" id="duration">مدة التصريح: —</div>
+  <div class="grid2"><div><label>إجمالي الرسوم (ر.س)</label><input id="total" type="number" min="0" step="0.01" value="0"></div><div><label>المبلغ المدفوع (ر.س)</label><input id="paid" type="number" min="0" step="0.01" value="0"></div></div>
+  <div class="statusline" id="remaining">المتبقي: 0.00 ر.س</div>
+  <label>ملاحظات خاصة بالاستقبال</label><textarea id="notes"></textarea>
+  <label style="display:flex;gap:8px;align-items:center"><input id="accessible" type="checkbox" style="width:24px;height:24px"> تخصيص لنزيل من ذوي الإعاقة ♿</label>
+  <label>حالة الموقف</label><select id="state"><option value="available">متاح</option><option value="occupied">مشغول</option><option value="reserved">محجوز</option><option value="maintenance">صيانة</option><option value="problem">توجد مشكلة</option></select>
+  <div class="actions"><button class="btn primary" id="saveBtn">حفظ الحجز وإصدار التصريح</button><button class="btn secondary" id="previewBtn">معاينة التصريح</button><button class="btn danger" id="clearBtn">إخلاء الموقف</button></div>
+  <div id="msg" class="notice">اختر موقفًا وجرّب النظام.</div>
+  <div id="permit" class="permit">
+    <div class="phead"><div class="picon">P</div><div><div class="ptitle">تصريح موقف</div><div>PARKING PERMIT</div></div></div>
+    <div class="big"><div><div style="color:#718096">رقم الموقف</div><div id="pSpot" class="num">03</div></div><div class="floor"><span>الطابق</span><b id="pFloor">B1</b></div></div>
+    <div style="margin-top:14px"><div class="rowp"><span>لوحة السيارة</span><b id="pPlate">—</b></div><div class="rowp"><span>رقم التصريح</span><b id="pCode">—</b></div><div class="rowp"><span>صالح من</span><b id="pFrom">—</b></div><div class="rowp"><span>صالح حتى</span><b id="pTo">—</b></div></div>
+    <div style="text-align:center;font-weight:800;margin-top:18px">يرجى إبراز التصريح للحارس عند الدخول</div>
+  </div>
+</div>
+</div>
+<script>
+const ST={available:'متاح',occupied:'مشغول',reserved:'محجوز',maintenance:'صيانة',problem:'مشكلة'};
+const spots=Array.from({length:20},(_,i)=>({id:i+1,floor:i<11?'B1':'B2',accessible:[1,12].includes(i+1),status:'available',room:'',plate:'',start:'',end:'',total:0,paid:0,notes:'',code:''}));let selected=3;
+const $=id=>document.getElementById(id),f2=n=>String(n).padStart(2,'0'),cur=()=>spots.find(x=>x.id===selected);
+function card(s){return `<button class="spot ${s.status} ${s.id===selected?'sel':''}" data-id="${s.id}">${s.accessible?'<span class="wheel">♿</span>':''}<b>${f2(s.id)}</b><small>${ST[s.status]}</small></button>`}
+function render(){b1.innerHTML=spots.filter(x=>x.floor==='B1').map(card).join('');b2.innerHTML=spots.filter(x=>x.floor==='B2').map(card).join('');const a1=spots.filter(x=>x.floor==='B1'&&x.status==='available').length,a2=spots.filter(x=>x.floor==='B2'&&x.status==='available').length;b1c.textContent=`متاح ${a1} / 11`;b2c.textContent=`متاح ${a2} / 9`;summary.textContent=`المتاح ${a1+a2} / 20`;fill()}
+function fill(){const s=cur();selTitle.textContent=`${s.floor} · موقف ${f2(s.id)}${s.accessible?' ♿':''}`;selStatus.textContent=ST[s.status];room.value=s.room;plate.value=s.plate;start.value=s.start;end.value=s.end;total.value=s.total;paid.value=s.paid;notes.value=s.notes;accessible.checked=s.accessible;state.value=s.status;money();dur()}
+function read(){const s=cur();s.room=room.value.trim();s.plate=plate.value.trim();s.start=start.value;s.end=end.value;s.total=Math.max(0,Number(total.value)||0);s.paid=Math.max(0,Number(paid.value)||0);s.notes=notes.value.trim();s.accessible=accessible.checked;s.status=state.value;return s}
+function money(){remaining.textContent=`المتبقي: ${Math.max(0,(Number(total.value)||0)-(Number(paid.value)||0)).toFixed(2)} ر.س`}
+function dur(){if(!start.value||!end.value){duration.textContent='مدة التصريح: —';return}const ms=new Date(end.value)-new Date(start.value);duration.textContent=ms>0?`مدة التصريح: ${(ms/36e5).toFixed(1)} ساعة`:'مدة التصريح: غير صحيحة'}
+function showPermit(){const s=read();if(!s.code)s.code=`PK-DEMO-${f2(s.id)}`;pSpot.textContent=f2(s.id);pFloor.textContent=s.floor;pPlate.textContent=s.plate||'—';pCode.textContent=s.code;pFrom.textContent=s.start||'—';pTo.textContent=s.end||'—';permit.classList.add('show')}
+document.addEventListener('click',e=>{const b=e.target.closest('.spot');if(b){selected=Number(b.dataset.id);render();msg.textContent=`تم اختيار الموقف ${f2(selected)}.`}});
+[total,paid].forEach(x=>x.addEventListener('input',money));[start,end].forEach(x=>x.addEventListener('input',dur));
+saveBtn.addEventListener('click',()=>{const s=read();if(!s.room||!s.plate){msg.textContent='أدخل رقم الغرفة ولوحة السيارة.';return}if(s.start&&s.end&&new Date(s.end)<=new Date(s.start)){msg.textContent='المغادرة يجب أن تكون بعد بداية التصريح.';return}if(['maintenance','problem'].includes(s.status)){msg.textContent='لا يمكن إصدار تصريح لموقف صيانة أو مشكلة.';render();return}if(s.status==='available')s.status='occupied';if(!s.code)s.code=`PK-DEMO-${f2(s.id)}`;render();showPermit();msg.textContent=`تم حفظ الحجز التجريبي للموقف ${f2(s.id)}.`});
+previewBtn.addEventListener('click',showPermit);
+clearBtn.addEventListener('click',()=>{const s=cur();Object.assign(s,{status:'available',room:'',plate:'',start:'',end:'',total:0,paid:0,notes:'',code:'',accessible:[1,12].includes(s.id)});permit.classList.remove('show');render();msg.textContent=`تم إخلاء الموقف ${f2(s.id)}.`});
+render();
+</script>
+</body>
+</html>
