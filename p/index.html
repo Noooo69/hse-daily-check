@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07101d">
+<title>تصريح موقف ديار المدينة</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(#07101d,#0d1b2d);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;color:#fff}
+.wrap{max-width:720px;margin:auto;padding:14px}
+.status{background:#10213a;border:1px solid #405978;border-radius:18px;padding:16px;text-align:center;margin-top:20px}
+.permit{background:#fff;color:#122844;border-radius:24px;padding:18px;box-shadow:0 16px 40px #0005}
+.permit-head{background:#122844;border-radius:15px;padding:12px;display:grid;grid-template-columns:100px 1fr 58px;align-items:center;gap:10px;direction:ltr;min-height:126px}
+.logo{width:96px;height:108px;object-fit:contain}
+.copy{direction:rtl;text-align:center;color:#fff}
+.copy h1{font-size:29px;margin:0;font-weight:900}
+.copy div{direction:ltr;font-size:15px;margin-top:4px}
+.pbox{width:54px;height:54px;border-radius:10px;background:#2b74ce;display:grid;place-items:center;color:#122844;font-size:34px;font-weight:900}
+.card{margin-top:14px;border:1px solid #d9e2ee;background:#f8fbff;border-radius:14px;padding:15px}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.floor{font-weight:900;color:#2675cf;font-size:19px}
+.num{font-size:66px;font-weight:900;line-height:1}
+.muted{color:#708197}
+.plate{margin-top:12px;padding-top:12px;border-top:1px solid #dbe3ed;font-weight:800}
+.row{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #dbe3ed;padding:12px 0}
+.msg{text-align:center;font-weight:900;margin-top:18px;font-size:18px}
+.qrWrap{display:flex;justify-content:center;margin-top:16px}
+.qrBox{background:#fff;padding:8px;border:1px solid #dbe3ed;border-radius:12px;min-width:144px;min-height:144px;display:grid;place-items:center}
+.verify{text-align:center;color:#71849d;font-size:12px;margin-top:7px}
+.print{margin-top:16px;background:#2b74ce;color:#fff;border-radius:12px;padding:14px;text-align:center;font-weight:900;cursor:pointer}
+@media(max-width:480px){.permit{padding:13px}.permit-head{grid-template-columns:86px 1fr 50px;min-height:112px;padding:9px}.logo{width:82px;height:94px}.copy h1{font-size:25px}.copy div{font-size:13px}.pbox{width:48px;height:48px;font-size:30px}.num{font-size:58px}}
+@media print{body{background:#fff}.wrap{padding:0}.permit{box-shadow:none}.print{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="status" class="status">جاري التحقق من التصريح...</div><div id="host"></div></div>
+<script>
+const SUPABASE_URL='https://xqoutasygbtuplqvvuyq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_QEZ_5qrV6dGBve6gg0xGkg_o0ABCAS9';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const pad=n=>String(n).padStart(2,'0');
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function fmt(v){if(!v)return '-';const d=new Date(v);return `${pad(d.getHours())}:${pad(d.getMinutes())} · ${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`}
+function floorFor(n){return Number(n)<=11?'B1':'B2'}
+function render(d){const cards=(d.spots||[]).map(raw=>{const n=Number(raw);return `<div class="card"><div class="top"><div><div class="floor">${floorFor(n)} · موقف</div><div class="num">${pad(n)}</div></div><div class="muted">رقم الموقف</div></div><div class="plate">لوحة السيارة: ${esc(d.plates?.[n]||d.plates?.[String(n)]||'-')}</div></div>`}).join('');document.getElementById('status').style.display='none';document.getElementById('host').innerHTML=`<div class="permit"><div class="permit-head"><img class="logo" src="../parking-preview/diyar-logo-transparent.png" alt="شعار ديار المدينة"><div class="copy"><h1>تصريح موقف</h1><div>PARKING PERMIT</div></div><div class="pbox">P</div></div>${cards}<div style="margin-top:14px"><div class="row"><span>رقم الغرفة</span><b>${esc(d.room)}</b></div><div class="row"><span>رقم التصريح</span><b>${esc(d.code)}</b></div><div class="row"><span>صالح من</span><b>${fmt(d.start)}</b></div><div class="row"><span>صالح حتى</span><b>${fmt(d.end)}</b></div></div><div class="qrWrap"><div class="qrBox" id="qr"></div></div><div class="verify">امسح الرمز للتحقق من التصريح</div><div class="msg">يرجى إبراز التصريح للحارس عند الدخول</div><div class="print" onclick="window.print()">🖨️ طباعة التصريح / حفظ PDF</div></div>`;if(window.QRCode)new QRCode(document.getElementById('qr'),{text:location.href,width:128,height:128})}
+async function boot(){const token=new URLSearchParams(location.search).get('p');if(!token){document.getElementById('status').textContent='رابط التصريح غير صالح';return}const {data,error}=await db.rpc('get_parking_permit_share',{p_token:token});if(error||!data||!data.length){document.getElementById('status').textContent='التصريح غير صالح أو انتهت صلاحيته';return}const r=data[0];render({room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:r.spots||[],plates:r.plates||{}})}
+boot();
+</script>
+</body>
+</html>
