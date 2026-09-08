@@ -32,12 +32,14 @@ body{margin:0;background:linear-gradient(#07101d,#0d1b2d);font-family:-apple-sys
 .msg{text-align:center;font-weight:900;margin-top:18px;font-size:18px}
 .qrGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px;align-items:start}
 .qrItem{text-align:center;min-width:0}
+.qrLink{text-decoration:none;color:inherit;display:block}
 .qrBox{background:#fff;padding:8px;border:1px solid #dbe3ed;border-radius:12px;width:max-content;max-width:100%;margin:0 auto;display:grid;place-items:center}
 .qrLabel{font-size:12px;color:#71849d;margin-top:7px;line-height:1.5;font-weight:700}
+.qrLabel span{display:block;color:#2675cf;font-size:11px;margin-top:2px;font-weight:800}
 .print{margin-top:16px;background:#2b74ce;color:#fff;border-radius:12px;padding:14px;text-align:center;font-weight:900;cursor:pointer}
 .expired{background:#10213a;border:1px solid #405978;border-radius:22px;padding:30px 18px;text-align:center;margin-top:20px}
 .expired h2{font-size:27px;margin:0 0 10px}.expired p{font-size:17px;margin:7px 0}.expired small{color:#b8c4d6;font-size:14px}
-@media(max-width:480px){.permit{padding:13px}.permit-head{grid-template-columns:86px 1fr 50px;min-height:112px;padding:9px}.logo{width:82px;height:94px}.copy h1{font-size:25px}.copy div{font-size:13px}.pbox{width:48px;height:48px;font-size:30px}.num{font-size:58px}.qrGrid{gap:8px}.qrBox{padding:6px}.qrLabel{font-size:11px}}
+@media(max-width:480px){.permit{padding:13px}.permit-head{grid-template-columns:86px 1fr 50px;min-height:112px;padding:9px}.logo{width:82px;height:94px}.copy h1{font-size:25px}.copy div{font-size:13px}.pbox{width:48px;height:48px;font-size:30px}.num{font-size:58px}.qrGrid{gap:8px}.qrBox{padding:6px}.qrLabel{font-size:11px}.qrLabel span{font-size:10px}}
 @media print{body{background:#fff}.wrap{padding:0}.permit{box-shadow:none}.print{display:none}}
 </style>
 </head>
@@ -68,7 +70,7 @@ function render(d){
   if(!Number.isFinite(currentEndMs)||Date.now()>=currentEndMs){showExpired();return}
   const cards=(d.spots||[]).map(raw=>{const n=Number(raw);return `<div class="card"><div class="top"><div><div class="floor">${floorFor(n)} · موقف</div><div class="num">${pad(n)}</div></div><div class="muted">رقم الموقف</div></div><div class="plate">لوحة السيارة: ${esc(d.plates?.[n]||d.plates?.[String(n)]||'-')}</div></div>`}).join('');
   document.getElementById('status').style.display='none';
-  document.getElementById('host').innerHTML=`<div class="permit"><div class="permit-head"><img class="logo" src="../parking-preview/diyar-logo-transparent.png" alt="شعار ديار المدينة"><div class="copy"><h1>تصريح موقف</h1><div>PARKING PERMIT</div></div><div class="pbox">P</div></div>${cards}<div style="margin-top:14px"><div class="row"><span>رقم الغرفة</span><b>${esc(d.room)}</b></div><div class="row"><span>رقم التصريح</span><b>${esc(d.code)}</b></div><div class="row"><span>صالح من</span><b>${fmt(d.start)}</b></div><div class="row"><span>صالح حتى</span><b>${fmt(d.end)}</b></div></div><div class="qrGrid"><div class="qrItem"><div class="qrBox" id="permitQr"></div><div class="qrLabel">التحقق من التصريح</div></div><div class="qrItem"><div class="qrBox" id="entranceQr"></div><div class="qrLabel">موقع مدخل المواقف</div></div></div><div class="msg">يرجى إبراز التصريح للحارس عند الدخول</div><div class="print" onclick="window.print()">🖨️ طباعة التصريح / حفظ PDF</div></div>`;
+  document.getElementById('host').innerHTML=`<div class="permit"><div class="permit-head"><img class="logo" src="../parking-preview/diyar-logo-transparent.png" alt="شعار ديار المدينة"><div class="copy"><h1>تصريح موقف</h1><div>PARKING PERMIT</div></div><div class="pbox">P</div></div>${cards}<div style="margin-top:14px"><div class="row"><span>رقم الغرفة</span><b>${esc(d.room)}</b></div><div class="row"><span>رقم التصريح</span><b>${esc(d.code)}</b></div><div class="row"><span>صالح من</span><b>${fmt(d.start)}</b></div><div class="row"><span>صالح حتى</span><b>${fmt(d.end)}</b></div></div><div class="qrGrid"><div class="qrItem"><div class="qrBox" id="permitQr"></div><div class="qrLabel">التحقق من التصريح</div></div><a class="qrItem qrLink" href="${GARAGE_ENTRANCE_URL}" target="_blank" rel="noopener"><div class="qrBox" id="entranceQr"></div><div class="qrLabel">موقع مدخل المواقف<span>امسح الرمز أو اضغط هنا لفتح الخريطة</span></div></a></div><div class="msg">يرجى إبراز التصريح للحارس عند الدخول</div><div class="print" onclick="window.print()">🖨️ طباعة التصريح / حفظ PDF</div></div>`;
   if(window.QRCode){
     new QRCode(document.getElementById('permitQr'),{text:location.href,width:118,height:118});
     new QRCode(document.getElementById('entranceQr'),{text:GARAGE_ENTRANCE_URL,width:118,height:118});
