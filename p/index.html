@@ -49,7 +49,7 @@ body{margin:0;background:linear-gradient(#07101d,#0d1b2d);font-family:-apple-sys
 const SUPABASE_URL='https://xqoutasygbtuplqvvuyq.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_QEZ_5qrV6dGBve6gg0xGkg_o0ABCAS9';
 const GARAGE_ENTRANCE_URL='https://maps.app.goo.gl/aAQT53yB6yq5pAN6A?g_st=ic';
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const db=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
 const pad=n=>String(n).padStart(2,'0');
 const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 function fmt(v){if(!v)return '-';const d=new Date(v);return `${pad(d.getHours())}:${pad(d.getMinutes())} · ${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`}
@@ -77,7 +77,8 @@ function render(d){
   }
   armExpiry(d.end);
 }
-async function boot(){const token=new URLSearchParams(location.search).get('p');if(!token){document.getElementById('status').textContent='رابط التصريح غير صالح';return}const {data,error}=await db.rpc('get_parking_permit_share',{p_token:token});if(error||!data||!data.length){showExpired();return}const r=data[0];render({room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:r.spots||[],plates:r.plates||{}})}
+function decodePermit(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return JSON.parse(decodeURIComponent(escape(atob(s))))}
+async function boot(){const params=new URLSearchParams(location.search),legacy=params.get('permit'),token=params.get('p');if(legacy){try{const d=decodePermit(legacy);render(d);return}catch(e){document.getElementById('status').textContent='رابط التصريح غير صالح';return}}if(!token){document.getElementById('status').textContent='رابط التصريح غير صالح';return}if(!db){document.getElementById('status').textContent='تعذر الاتصال بخدمة التحقق حالياً';return}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:token});if(error||!data||!data.length){showExpired();return}const r=data[0];render({room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:r.spots||[],plates:r.plates||{}})}catch(e){document.getElementById('status').textContent='تعذر الاتصال بخدمة التحقق حالياً'}}
 boot();
 </script>
 </body>
