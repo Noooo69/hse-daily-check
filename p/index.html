@@ -77,8 +77,27 @@ function render(d){
   }
   armExpiry(d.end);
 }
+function b64UrlToText(token){
+  let s=String(token||'').replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  const bin=atob(s),bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes)
+}
+function decodeCompactPermit(token){
+  const a=JSON.parse(b64UrlToText(token));
+  if(!Array.isArray(a)||a[0]!==1)throw new Error('bad version');
+  const room=String(a[1]||'');
+  const spots=[...String(a[2]||'')].map(ch=>parseInt(ch,36)).filter(n=>Number.isInteger(n)&&n>=1&&n<=20);
+  if(!room||!spots.length)throw new Error('bad data');
+  const list=Array.isArray(a[3])?a[3]:[];
+  const plates={};spots.forEach((n,i)=>plates[n]=String(list[i]||''));
+  const startMs=parseInt(String(a[4]),36)*60000,endMs=parseInt(String(a[5]),36)*60000;
+  if(!Number.isFinite(startMs)||!Number.isFinite(endMs)||endMs<=startMs)throw new Error('bad dates');
+  return {room,spots,plates,start:new Date(startMs).toISOString(),end:new Date(endMs).toISOString(),code:'PK-'+room+'-'+spots.map(pad).join('')}
+}
 function decodePermit(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return JSON.parse(decodeURIComponent(escape(atob(s))))}
-async function boot(){const params=new URLSearchParams(location.search),legacy=params.get('permit'),token=params.get('p');if(legacy){try{const d=decodePermit(legacy);render(d);return}catch(e){document.getElementById('status').textContent='رابط التصريح غير صالح';return}}if(!token){document.getElementById('status').textContent='رابط التصريح غير صالح';return}if(!db){document.getElementById('status').textContent='تعذر الاتصال بخدمة التحقق حالياً';return}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:token});if(error||!data||!data.length){showExpired();return}const r=data[0];render({room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:r.spots||[],plates:r.plates||{}})}catch(e){document.getElementById('status').textContent='تعذر الاتصال بخدمة التحقق حالياً'}}
+async function boot(){const params=new URLSearchParams(location.search),compact=params.get('d'),legacy=params.get('permit'),token=params.get('p');if(compact){try{const d=decodeCompactPermit(compact);render(d);return}catch(e){document.getElementById('status').textContent='رابط التصريح غير صالح';return}}if(legacy){try{const d=decodePermit(legacy);render(d);return}catch(e){document.getElementById('status').textContent='رابط التصريح غير صالح';return}}if(!token){document.getElementById('status').textContent='رابط التصريح غير صالح';return}if(!db){document.getElementById('status').textContent='تعذر الاتصال بخدمة التحقق حالياً';return}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:token});if(error||!data||!data.length){showExpired();return}const r=data[0];render({room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:r.spots||[],plates:r.plates||{}})}catch(e){document.getElementById('status').textContent='تعذر الاتصال بخدمة التحقق حالياً'}}
 boot();
 </script>
 </body>
