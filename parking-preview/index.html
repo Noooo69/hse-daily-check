@@ -79,7 +79,7 @@ async function signInReception(){if(!db){$('authMsg').textContent='خدمة تس
 async function signOutReception(){if(!db)return;try{await db.auth.signOut()}catch(e){}$('authMsg').textContent='تم تسجيل الخروج.';await refreshAuthUI()}
 async function getReceptionSession(){if(!db)return null;try{const {data}=await db.auth.getSession();return data?.session||null}catch(e){return null}}
 function validGuestData(data){
-  if(!data?.spots?.length){alert('اختر موقفاً');return false}
+  if(data?.parkingMode!=='auto'&&!data?.spots?.length){alert('اختر موقفاً');return false}
   if(!data.room){alert('أدخل رقم الغرفة');return false}
   if(new Date(data.end)<=new Date(data.start)||new Date(data.end)<=new Date()){
     alert('تأكد أن نهاية التصريح بعد البداية وفي المستقبل');return false
@@ -125,6 +125,8 @@ function compactGuestLink(data){
 function permitShareSignature(data){
   return JSON.stringify({
     id:String(data?.id||currentEditId||''),
+    guestName:String(data?.guestName||''),
+    parkingMode:String(data?.parkingMode||'specific'),
     room:String(data?.room||''),
     spots:(data?.spots||[]).map(Number),
     plates:data?.plates||{},
@@ -179,10 +181,12 @@ async function createSupabaseShare(data,{promptLogin=false}={}){
       $('linkMsg').textContent='جاري إنشاء الرابط القصير...';
       const bookingRef=String(data.id||currentEditId||data.code||permitCode(data.room,data.spots));
       const {data:token,error}=await withTimeout(
-        db.rpc('create_parking_permit_share_v2',{
+        db.rpc('create_parking_permit_share_v3',{
           p_booking_ref:bookingRef,
+          p_guest_name:data.guestName||'',
+          p_parking_mode:data.parkingMode||'specific',
           p_room_no:data.room,
-          p_permit_code:data.code||permitCode(data.room,data.spots),
+          p_permit_code:data.code||permitCode(data.room,data.spots,data.parkingMode||'specific'),
           p_valid_from:new Date(data.start).toISOString(),
           p_valid_until:new Date(data.end).toISOString(),
           p_spots:data.spots,
@@ -213,7 +217,8 @@ async function createSupabaseShare(data,{promptLogin=false}={}){
   return shareLinkPromise
 }
 async function prepareShareLink(data){
-  if(!data?.spots?.length||!data?.room)return null;
+  if(!data?.room)return null;
+  if(data.parkingMode!=='auto'&&!data?.spots?.length)return null;
   return createSupabaseShare(data,{promptLogin:false})
 }
 async function createGuestLink(){
@@ -240,10 +245,10 @@ async function sharePermit(){
   if(!validGuestData(data))return;
   const url=await createSupabaseShare(data,{promptLogin:true});
   if(!url)return;
-  const msg=`تصريح موقف ديار المدينة\nالغرفة: ${data.room||'-'}\nرقم التصريح: ${data.code||permitCode(data.room,data.spots)}\n${url}`;
+  const msg=`تصريح موقف ديار المدينة\n${data.guestName?'الاسم: '+data.guestName+'\n':''}الغرفة: ${data.room||'-'}\n${data.parkingMode==='auto'&&!data.spots.length?'الموقف: يحدد عند الوصول\n':''}رقم التصريح: ${data.code||permitCode(data.room,data.spots,data.parkingMode||'specific')}\n${url}`;
   window.location.href='https://wa.me/?text='+encodeURIComponent(msg)
 }
-async function guestMode(){const params=new URLSearchParams(location.search),compact=params.get('d'),shortToken=params.get('p'),legacy=params.get('permit');if(!compact&&!shortToken&&!legacy)return false;$('staffView').classList.add('hidden');$('staffTopbar')?.classList.add('hidden');$('guestView').classList.remove('hidden');if(compact){try{const d=decodeCompactPermit(compact);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}if(shortToken){$('guestView').innerHTML='<div class="panel"><div class="title">جاري التحقق من التصريح...</div></div>';if(!db){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:shortToken});if(error||!data||!data.length){$('guestView').innerHTML='<div class="panel"><div class="title">التصريح غير صالح أو انتهت صلاحيته</div></div>';return true}const r=data[0],d={room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:(r.spots||[]).map(Number),plates:r.plates||{}};$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}}try{const d=decodePermit(legacy);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch{$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}
+async function guestMode(){const params=new URLSearchParams(location.search),compact=params.get('d'),shortToken=params.get('p'),legacy=params.get('permit');if(!compact&&!shortToken&&!legacy)return false;$('staffView').classList.add('hidden');$('staffTopbar')?.classList.add('hidden');$('guestView').classList.remove('hidden');if(compact){try{const d=decodeCompactPermit(compact);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}if(shortToken){$('guestView').innerHTML='<div class="panel"><div class="title">جاري التحقق من التصريح...</div></div>';if(!db){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}try{const {data,error}=await db.rpc('get_parking_permit_share_v2',{p_token:shortToken});if(error||!data||!data.length){$('guestView').innerHTML='<div class="panel"><div class="title">التصريح غير صالح أو انتهت صلاحيته</div></div>';return true}const r=data[0],d={guestName:r.guest_name||'',parkingMode:r.parking_mode||'specific',room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:(r.spots||[]).map(Number),plates:r.plates||{}};$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}}try{const d=decodePermit(legacy);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch{$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 window.addEventListener('storage',()=>{bookings=loadJSON(STORAGE_KEY,[]);logs=loadJSON(LOG_KEY,[]);renderAll()});
 
