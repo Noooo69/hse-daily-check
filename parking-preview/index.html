@@ -3,7 +3,7 @@
 @media(max-width:700px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(4,1fr)}.form{grid-template-columns:1fr}.wide{grid-column:auto}.toolbar{grid-template-columns:1fr}.quickbtn{width:100%}.permit{padding:14px}.permit-head{grid-template-columns:92px 1fr 54px;min-height:122px;padding:10px;gap:8px}.logo-box{width:90px;height:104px}.logo{width:88px;height:102px}.copy h1{font-size:27px}.copy div{font-size:14px}.pbox{width:52px;height:52px;font-size:32px}.num{font-size:62px}}
 @media(max-width:430px){.grid{grid-template-columns:repeat(3,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}
 @media print{body{background:#fff}.no-print,.topbar,.stats,.toolbar,.alertsPanel,.spotsPanel,.formPanel,.listsPanel,.tabs{display:none!important}.wrap{max-width:none;padding:0}.panel{border:0;background:#fff;padding:0}.permit{box-shadow:none;margin:0}.print{display:none}.permitWrap{display:block!important}}
-</style></head><body><div class="wrap"><div class="panel topbar no-print" id="staffTopbar"><div class="brand"><img src="./diyar-logo-transparent.png" alt="ديار المدينة"><div><div class="title">نظام مواقف ديار المدينة</div><div class="sub">تشغيل سريع للاستقبال والحارس — B1 / B2</div></div></div><div class="tabs"><button class="tab active" data-tab="reception" onclick="switchTab('reception')">الاستقبال</button><button class="tab" data-tab="guard" onclick="switchTab('guard')">الحارس</button><button class="tab" data-tab="records" onclick="switchTab('records')">السجل</button><button class="tab" id="authBtn" onclick="openAuthModal()">دخول الاستقبال</button></div></div><div id="staffView"><div class="panel stats no-print" id="stats"></div><div class="panel toolbar no-print"><input id="search" class="search" placeholder="ابحث برقم الغرفة، اللوحة، رقم التصريح أو الموقف..." oninput="renderAll()"><button class="quickbtn" onclick="openQuickBooking()">+ حجز سريع</button><div class="legend wide"><span><i class="dot" style="background:#1f7a5a"></i>متاح</span><span><i class="dot" style="background:#8f3c4a"></i>مشغول</span><span><i class="dot" style="background:#8f7a25"></i>محجوز</span><span><i class="dot" style="background:#68707c"></i>صيانة</span><span><i class="dot" style="background:#9b5034"></i>مشكلة</span></div></div><div id="receptionTab"><div class="panel alertsPanel no-print"><div class="sectionTitle">تنبيهات اليوم</div><div id="alerts" class="alerts"></div></div><div class="panel spotsPanel no-print"><div class="sectionTitle">خريطة المواقف</div><div class="floor">B1 — 11 مواقف</div><div class="grid" id="b1"></div><div class="floor">B2 — 9 مواقف</div><div class="grid" id="b2"></div></div><div class="panel formPanel no-print"><div class="sectionTitle">حجز / تعديل تصريح</div><label style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><input type="checkbox" id="multi" onchange="toggleMulti()"> حجز عدة مواقف لنفس النزيل</label><div class="form"><div class="field"><label>رقم الغرفة</label><input id="room" value="204"></div><div class="field"><label>لوحة السيارة</label><input id="plate" value="أ ب ج 1234"></div><div class="field"><label>صالح من</label><input id="start" type="datetime-local"></div><div class="field"><label>صالح حتى</label><input id="end" type="datetime-local"></div><div class="field"><label>الحالة</label><select id="status" onchange="toggleIssueReason()"><option value="occupied">مشغول</option><option value="reserved">محجوز</option><option value="maintenance">صيانة</option><option value="problem">مشكلة</option></select></div><div class="field hidden" id="issueReasonWrap"><label>سبب الصيانة / المشكلة</label><select id="issueReason"><option>تسرب مياه</option><option>إضاءة</option><option>حاجز تالف</option><option>محجوز للإدارة</option><option>أخرى</option></select></div><div class="field wide"><button class="details-toggle" onclick="toggleDetails()">تفاصيل إضافية ▼</button></div><div id="extraDetails" class="wide hidden"><div class="form"><div class="field"><label>المبلغ</label><input id="amount" type="number" value="50"></div><div class="field"><label>المدفوع</label><input id="paid" type="number" value="50"></div><div class="field wide"><label>ملاحظات الاستقبال</label><textarea id="notes" placeholder="لا تظهر للحارس أو النزيل"></textarea></div></div></div></div><div id="multiPlates" class="hidden"><div class="floor">لوحات السيارات للمواقف المختارة</div><div id="platesList" class="form"></div></div><div class="actions"><button class="btn primary" onclick="saveBooking()">حفظ الحجز</button><button class="btn secondary" onclick="previewPermit()">معاينة التصريح</button><button class="btn secondary" onclick="createGuestLink()">إنشاء رابط مؤقت</button><button class="btn secondary" onclick="sharePermit()">مشاركة</button><button class="btn danger" onclick="clearForm()">مسح</button></div><div class="mini" id="linkMsg"></div></div><div class="panel listsPanel no-print"><div class="sectionTitle">الحجوزات النشطة</div><div id="bookingList" class="booking-list"></div></div><div class="panel permitWrap" id="permitHost"></div></div><div id="guardTab" class="hidden"><div class="panel no-print"><div class="guard-banner"><b>واجهة الحارس</b><div class="guard-private">تعرض فقط: الموقف، الغرفة، اللوحة، الصلاحية وحالة الدخول. لا تعرض المبلغ أو ملاحظات الاستقبال.</div></div></div><div class="panel no-print"><div class="sectionTitle">التصاريح الحالية</div><div id="guardList" class="guard-list"></div></div></div><div id="recordsTab" class="hidden"><div class="panel no-print"><div class="sectionTitle">سجل الحركات</div><div class="actions" style="margin-top:0;margin-bottom:10px"><button class="btn secondary" onclick="exportData()">تصدير نسخة احتياطية</button><button class="btn danger" onclick="clearLogs()">مسح السجل</button></div><div id="logList" class="log-list"></div></div></div></div><div class="panel permitWrap hidden" id="guestView"></div></div><div class="modal" id="quickModal"><div class="sheet"><div class="sheethead"><div><div class="sectionTitle">حجز سريع</div><div class="sub" id="quickSpotLabel">اختر موقفاً</div></div><button class="close" onclick="closeQuickBooking()">×</button></div><div class="form" style="margin-top:12px"><div class="field"><label>رقم الغرفة</label><input id="qRoom"></div><div class="field"><label>لوحة السيارة</label><input id="qPlate"></div><div class="field"><label>صالح حتى</label><input id="qEnd" type="datetime-local"></div><div class="field"><label>الحالة</label><select id="qStatus"><option value="occupied">مشغول</option><option value="reserved">محجوز</option></select></div></div><div class="actions"><button class="btn primary" onclick="confirmQuickBooking()">تأكيد الحجز</button><button class="btn secondary" onclick="closeQuickBooking()">إلغاء</button></div></div></div><div class="modal" id="authModal"><div class="sheet"><div class="sheethead"><div><div class="sectionTitle">دخول موظف الاستقبال</div><div class="sub">مطلوب فقط لإنشاء الروابط القصيرة الآمنة.</div></div><button class="close" onclick="closeAuthModal()">×</button></div><div class="form" style="margin-top:12px"><div class="field"><label>البريد الإلكتروني</label><input id="authEmail" type="email" autocomplete="username"></div><div class="field"><label>كلمة المرور</label><input id="authPassword" type="password" autocomplete="current-password"></div></div><div class="actions"><button class="btn primary" onclick="signInReception()">تسجيل الدخول</button><button class="btn secondary" onclick="signOutReception()">تسجيل الخروج</button><button class="btn secondary" onclick="closeAuthModal()">إلغاء</button></div><div class="mini" id="authMsg"></div></div></div><script>
+</style></head><body><div class="wrap"><div class="panel topbar no-print" id="staffTopbar"><div class="brand"><img src="./diyar-logo-transparent.png" alt="ديار المدينة"><div><div class="title">نظام مواقف ديار المدينة</div><div class="sub">تشغيل سريع للاستقبال والحارس — B1 / B2</div></div></div><div class="tabs"><button class="tab active" data-tab="reception" onclick="switchTab('reception')">الاستقبال</button><button class="tab" data-tab="guard" onclick="switchTab('guard')">الحارس</button><button class="tab" data-tab="records" onclick="switchTab('records')">السجل</button><button class="tab hidden" id="authBtn" onclick="openAuthModal()">دخول الاستقبال</button></div></div><div id="staffView"><div class="panel stats no-print" id="stats"></div><div class="panel toolbar no-print"><input id="search" class="search" placeholder="ابحث برقم الغرفة، اللوحة، رقم التصريح أو الموقف..." oninput="renderAll()"><button class="quickbtn" onclick="openQuickBooking()">+ حجز سريع</button><div class="legend wide"><span><i class="dot" style="background:#1f7a5a"></i>متاح</span><span><i class="dot" style="background:#8f3c4a"></i>مشغول</span><span><i class="dot" style="background:#8f7a25"></i>محجوز</span><span><i class="dot" style="background:#68707c"></i>صيانة</span><span><i class="dot" style="background:#9b5034"></i>مشكلة</span></div></div><div id="receptionTab"><div class="panel alertsPanel no-print"><div class="sectionTitle">تنبيهات اليوم</div><div id="alerts" class="alerts"></div></div><div class="panel spotsPanel no-print"><div class="sectionTitle">خريطة المواقف</div><div class="floor">B1 — 11 مواقف</div><div class="grid" id="b1"></div><div class="floor">B2 — 9 مواقف</div><div class="grid" id="b2"></div></div><div class="panel formPanel no-print"><div class="sectionTitle">حجز / تعديل تصريح</div><label style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><input type="checkbox" id="multi" onchange="toggleMulti()"> حجز عدة مواقف لنفس النزيل</label><div class="form"><div class="field"><label>رقم الغرفة</label><input id="room" value="204"></div><div class="field"><label>لوحة السيارة</label><input id="plate" value="أ ب ج 1234"></div><div class="field"><label>صالح من</label><input id="start" type="datetime-local"></div><div class="field"><label>صالح حتى</label><input id="end" type="datetime-local"></div><div class="field"><label>الحالة</label><select id="status" onchange="toggleIssueReason()"><option value="occupied">مشغول</option><option value="reserved">محجوز</option><option value="maintenance">صيانة</option><option value="problem">مشكلة</option></select></div><div class="field hidden" id="issueReasonWrap"><label>سبب الصيانة / المشكلة</label><select id="issueReason"><option>تسرب مياه</option><option>إضاءة</option><option>حاجز تالف</option><option>محجوز للإدارة</option><option>أخرى</option></select></div><div class="field wide"><button class="details-toggle" onclick="toggleDetails()">تفاصيل إضافية ▼</button></div><div id="extraDetails" class="wide hidden"><div class="form"><div class="field"><label>المبلغ</label><input id="amount" type="number" value="50"></div><div class="field"><label>المدفوع</label><input id="paid" type="number" value="50"></div><div class="field wide"><label>ملاحظات الاستقبال</label><textarea id="notes" placeholder="لا تظهر للحارس أو النزيل"></textarea></div></div></div></div><div id="multiPlates" class="hidden"><div class="floor">لوحات السيارات للمواقف المختارة</div><div id="platesList" class="form"></div></div><div class="actions"><button class="btn primary" onclick="saveBooking()">حفظ الحجز</button><button class="btn secondary" onclick="previewPermit()">معاينة التصريح</button><button class="btn secondary" onclick="createGuestLink()">إنشاء رابط مؤقت</button><button class="btn secondary" onclick="sharePermit()">مشاركة</button><button class="btn danger" onclick="clearForm()">مسح</button></div><div class="mini" id="linkMsg"></div></div><div class="panel listsPanel no-print"><div class="sectionTitle">الحجوزات النشطة</div><div id="bookingList" class="booking-list"></div></div><div class="panel permitWrap" id="permitHost"></div></div><div id="guardTab" class="hidden"><div class="panel no-print"><div class="guard-banner"><b>واجهة الحارس</b><div class="guard-private">تعرض فقط: الموقف، الغرفة، اللوحة، الصلاحية وحالة الدخول. لا تعرض المبلغ أو ملاحظات الاستقبال.</div></div></div><div class="panel no-print"><div class="sectionTitle">التصاريح الحالية</div><div id="guardList" class="guard-list"></div></div></div><div id="recordsTab" class="hidden"><div class="panel no-print"><div class="sectionTitle">سجل الحركات</div><div class="actions" style="margin-top:0;margin-bottom:10px"><button class="btn secondary" onclick="exportData()">تصدير نسخة احتياطية</button><button class="btn danger" onclick="clearLogs()">مسح السجل</button></div><div id="logList" class="log-list"></div></div></div></div><div class="panel permitWrap hidden" id="guestView"></div></div><div class="modal" id="quickModal"><div class="sheet"><div class="sheethead"><div><div class="sectionTitle">حجز سريع</div><div class="sub" id="quickSpotLabel">اختر موقفاً</div></div><button class="close" onclick="closeQuickBooking()">×</button></div><div class="form" style="margin-top:12px"><div class="field"><label>رقم الغرفة</label><input id="qRoom"></div><div class="field"><label>لوحة السيارة</label><input id="qPlate"></div><div class="field"><label>صالح حتى</label><input id="qEnd" type="datetime-local"></div><div class="field"><label>الحالة</label><select id="qStatus"><option value="occupied">مشغول</option><option value="reserved">محجوز</option></select></div></div><div class="actions"><button class="btn primary" onclick="confirmQuickBooking()">تأكيد الحجز</button><button class="btn secondary" onclick="closeQuickBooking()">إلغاء</button></div></div></div><div class="modal" id="authModal"><div class="sheet"><div class="sheethead"><div><div class="sectionTitle">دخول موظف الاستقبال</div><div class="sub">مطلوب فقط لإنشاء الروابط القصيرة الآمنة.</div></div><button class="close" onclick="closeAuthModal()">×</button></div><div class="form" style="margin-top:12px"><div class="field"><label>البريد الإلكتروني</label><input id="authEmail" type="email" autocomplete="username"></div><div class="field"><label>كلمة المرور</label><input id="authPassword" type="password" autocomplete="current-password"></div></div><div class="actions"><button class="btn primary" onclick="signInReception()">تسجيل الدخول</button><button class="btn secondary" onclick="signOutReception()">تسجيل الخروج</button><button class="btn secondary" onclick="closeAuthModal()">إلغاء</button></div><div class="mini" id="authMsg"></div></div></div><script>
 const LOGO_DATA='./diyar-logo-transparent.png';
 const SUPABASE_URL='https://xqoutasygbtuplqvvuyq.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_QEZ_5qrV6dGBve6gg0xGkg_o0ABCAS9';
@@ -45,8 +45,8 @@ function formPlates(){if($('multi').checked){const o={};selected.forEach(n=>o[n]
 function permitCode(room,ss){return 'PK-'+(room||'ROOM')+'-'+ss.map(pad).join('')}
 function collectForm(){return{room:$('room').value.trim(),spots:[...selected],plates:formPlates(),start:$('start').value,end:$('end').value,status:$('status').value,amount:$('amount').value,paid:$('paid').value,notes:$('notes').value,issueReason:($('status').value==='maintenance'||$('status').value==='problem')?$('issueReason').value:'',code:permitCode($('room').value.trim(),selected)}}
 function validateData(d){if(!d.spots.length){alert('اختر موقفاً');return false}if(!d.room){alert('أدخل رقم الغرفة');return false}if(new Date(d.end)<=new Date(d.start)){alert('تاريخ المغادرة يجب أن يكون بعد البداية');return false}const conflict=d.spots.find(n=>{const b=bookingForSpot(n);return b&&b.id!==currentEditId});if(conflict){alert(`الموقف ${pad(conflict)} مستخدم حالياً`);return false}return true}
-function saveBooking(){const d=collectForm();if(!validateData(d))return;let b;if(currentEditId){b=bookings.find(x=>x.id===currentEditId);Object.assign(b,d,{updatedAt:new Date().toISOString(),shareUrl:'',shareToken:'',shareSignature:''});addLog('تعديل حجز',b,b.issueReason||'')}else{b={...d,id:'B'+Date.now(),active:true,entryConfirmed:false,shareUrl:'',shareToken:'',shareSignature:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};bookings.unshift(b);addLog('إنشاء حجز',b,b.issueReason||'')}saveState();currentEditId=b.id;renderAll();previewPermit(b);prepareShareLink(b).then(url=>{if(url&&currentEditId===b.id)$('linkMsg').textContent='الرابط المختصر جاهز ✓'}).catch(()=>{});alert('تم حفظ الحجز')}
-function editBooking(id){const b=bookings.find(x=>x.id===id);if(!b)return;currentEditId=id;selected=[...b.spots];$('multi').checked=b.spots.length>1;$('room').value=b.room;$('plate').value=b.plates[b.spots[0]]||'';$('start').value=b.start;$('end').value=b.end;$('status').value=b.status;$('amount').value=b.amount||'';$('paid').value=b.paid||'';$('notes').value=b.notes||'';toggleIssueReason();if(b.issueReason)$('issueReason').value=b.issueReason;renderPlateInputs();if(b.spots.length>1)b.spots.forEach(n=>{const el=$(`mplate${n}`);if(el)el.value=b.plates[n]||''});switchTab('reception');renderSpots();prepareShareLink(b).catch(()=>{});window.scrollTo({top:document.querySelector('.formPanel').offsetTop-20,behavior:'smooth'})}
+function saveBooking(){const d=collectForm();if(!validateData(d))return;let b;if(currentEditId){b=bookings.find(x=>x.id===currentEditId);Object.assign(b,d,{updatedAt:new Date().toISOString(),shareUrl:'',shareToken:'',shareSignature:''});addLog('تعديل حجز',b,b.issueReason||'')}else{b={...d,id:'B'+Date.now(),active:true,entryConfirmed:false,shareUrl:'',shareToken:'',shareSignature:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};bookings.unshift(b);addLog('إنشاء حجز',b,b.issueReason||'')}saveState();currentEditId=b.id;renderAll();previewPermit(b);alert('تم حفظ الحجز')}
+function editBooking(id){const b=bookings.find(x=>x.id===id);if(!b)return;currentEditId=id;selected=[...b.spots];$('multi').checked=b.spots.length>1;$('room').value=b.room;$('plate').value=b.plates[b.spots[0]]||'';$('start').value=b.start;$('end').value=b.end;$('status').value=b.status;$('amount').value=b.amount||'';$('paid').value=b.paid||'';$('notes').value=b.notes||'';toggleIssueReason();if(b.issueReason)$('issueReason').value=b.issueReason;renderPlateInputs();if(b.spots.length>1)b.spots.forEach(n=>{const el=$(`mplate${n}`);if(el)el.value=b.plates[n]||''});switchTab('reception');renderSpots();window.scrollTo({top:document.querySelector('.formPanel').offsetTop-20,behavior:'smooth'})}
 function clearForm(){currentEditId=null;selected=[3];$('multi').checked=false;$('room').value='';$('plate').value='';$('notes').value='';$('amount').value='50';$('paid').value='50';$('status').value='occupied';toggleIssueReason();initDates();renderPlateInputs();renderSpots();$('permitHost').innerHTML=''}
 function checkout(id){const b=bookings.find(x=>x.id===id);if(!b||!confirm(`تأكيد مغادرة الغرفة ${b.room} وتحرير الموقف؟`))return;b.active=false;b.checkoutAt=new Date().toISOString();addLog('مغادرة النزيل',b);saveState();renderAll();if(b.shareToken&&db)db.rpc('revoke_parking_permit_share',{p_token:b.shareToken}).catch(()=>{});if(currentEditId===id)clearForm()}
 function confirmEntry(id){const b=bookings.find(x=>x.id===id);if(!b)return;b.entryConfirmed=true;b.entryAt=new Date().toISOString();addLog('تأكيد الدخول',b);saveState();renderAll()}
@@ -63,7 +63,7 @@ function fmt(v){if(!v)return '-';const d=new Date(v);return `${pad(d.getHours())
 function permitDataFromCurrent(){if(currentEditId){const b=bookings.find(x=>x.id===currentEditId);if(b)return b}return collectForm()}
 function permitHTML(data,guestUrl=''){const cards=data.spots.map(n=>`<div class="permit-spot"><div class="spot-top"><div><div class="floorname">${spots.find(s=>s.n===n)?.f||''} · موقف</div><div class="num">${pad(n)}</div></div><div style="color:#708197">رقم الموقف</div></div><div class="plate">لوحة السيارة: ${escapeHtml(data.plates[n]||'-')}</div></div>`).join('');return `<div class="permit"><div class="permit-head"><div class="logo-box"><img class="logo" src="${LOGO_DATA}" alt="شعار ديار المدينة"></div><div class="copy"><h1>تصريح موقف</h1><div>PARKING PERMIT</div></div><div class="pbox">P</div></div>${cards}<div style="margin-top:16px"><div class="prow"><span>رقم الغرفة</span><b>${escapeHtml(data.room||'-')}</b></div><div class="prow"><span>رقم التصريح</span><b>${escapeHtml(data.code||permitCode(data.room,data.spots))}</b></div><div class="prow"><span>صالح من</span><b>${fmt(data.start)}</b></div><div class="prow"><span>صالح حتى</span><b>${fmt(data.end)}</b></div></div>${guestUrl?'<div class="qrWrap"><div class="qrBox" id="permitQR"></div></div><div class="mini" style="text-align:center;color:#71849d">امسح الرمز للتحقق من التصريح</div>':''}<div class="msg">يرجى إبراز التصريح للحارس عند الدخول</div><div class="print" onclick="window.print()">🖨️ طباعة التصريح / حفظ PDF</div></div>`}
 function previewPermit(data=permitDataFromCurrent()){if(!data.spots?.length){alert('اختر موقفاً');return}$('permitHost').innerHTML=permitHTML(data);window.scrollTo({top:$('permitHost').offsetTop-20,behavior:'smooth'})}
-function previewPermitById(id){const b=bookings.find(x=>x.id===id);if(b){currentEditId=id;previewPermit(b);prepareShareLink(b).catch(()=>{})}}
+function previewPermitById(id){const b=bookings.find(x=>x.id===id);if(b){currentEditId=id;previewPermit(b)}}
 function encodePermit(o){return btoa(unescape(encodeURIComponent(JSON.stringify({room:o.room,spots:o.spots,plates:o.plates,start:o.start,end:o.end,code:o.code})))) .replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_')}
 function decodePermit(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return JSON.parse(decodeURIComponent(escape(atob(s))))}
 function openAuthModal(){$('authModal').classList.add('show');$('authMsg').textContent=''}
@@ -72,119 +72,88 @@ async function refreshAuthUI(){if(!db||!$('authBtn'))return;try{const {data}=awa
 async function signInReception(){if(!db){$('authMsg').textContent='خدمة تسجيل الدخول غير متاحة حالياً. يمكنك إنشاء ومشاركة التصريح بدون تسجيل دخول.';return}$('authMsg').textContent='جاري تسجيل الدخول...';const email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||!password){$('authMsg').textContent='أدخل البريد وكلمة المرور.';return}try{const {error}=await db.auth.signInWithPassword({email,password});if(error){$('authMsg').textContent='تعذر تسجيل الدخول: '+error.message;return}$('authMsg').textContent='تم تسجيل الدخول بنجاح ✓';$('authPassword').value='';await refreshAuthUI();setTimeout(closeAuthModal,500)}catch(e){$('authMsg').textContent='خدمة تسجيل الدخول غير متصلة حالياً. استخدم زر إنشاء الرابط أو مشاركة وسيعمل النظام بالوضع الاحتياطي.'}}
 async function signOutReception(){if(!db)return;try{await db.auth.signOut()}catch(e){}$('authMsg').textContent='تم تسجيل الخروج.';await refreshAuthUI()}
 async function getReceptionSession(){if(!db)return null;try{const {data}=await db.auth.getSession();return data?.session||null}catch(e){return null}}
-function validGuestData(data){if(!data?.spots?.length){alert('اختر موقفاً');return false}if(!data.room){alert('أدخل رقم الغرفة');return false}if(new Date(data.end)<=new Date(data.start)||new Date(data.end)<=new Date()){alert('تأكد أن نهاية التصريح بعد البداية وفي المستقبل');return false}return true}
-function createFallbackGuestLink(data){return PUBLIC_PERMIT_BASE+'?permit='+encodeURIComponent(encodePermit(data))}
-function shortenJsonp(domain,longUrl,timeoutMs=2600){
-  return new Promise((resolve,reject)=>{
-    const cb='diyarShort_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-    const s=document.createElement('script');
-    let done=false;
-    const cleanup=()=>{if(done)return;done=true;try{delete window[cb]}catch(e){window[cb]=undefined}s.remove()};
-    const timer=setTimeout(()=>{cleanup();reject(new Error('shortener timeout'))},timeoutMs);
-    window[cb]=(r)=>{clearTimeout(timer);cleanup();if(r&&r.shorturl)resolve(r.shorturl);else reject(new Error(r?.errormessage||'shortener error'))};
-    s.src='https://'+domain+'/create.php?format=json&callback='+encodeURIComponent(cb)+'&url='+encodeURIComponent(longUrl);
-    s.onerror=()=>{clearTimeout(timer);cleanup();reject(new Error('shortener unavailable'))};
-    document.head.appendChild(s);
-  });
-}
-async function shortenFast(longUrl){
-  return Promise.any([
-    shortenJsonp('is.gd',longUrl,2600),
-    shortenJsonp('v.gd',longUrl,2600)
-  ]);
-}
-function permitSignature(data){
-  return JSON.stringify({
-    room:String(data?.room||''),
-    spots:(data?.spots||[]).map(Number),
-    plates:data?.plates||{},
-    start:String(data?.start||''),
-    end:String(data?.end||''),
-    code:String(data?.code||permitCode(data?.room||'',data?.spots||[]))
-  });
-}
-function cachedShortUrl(data){
-  const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.code===data?.code);
-  if(!b)return '';
-  const u=b.shareUrl||'';
-  if(b.shareSignature!==permitSignature(data))return '';
-  return /^https:\/\/(is\.gd|v\.gd)\//i.test(u)||/[?&]p=/.test(u)?u:'';
-}
-function storeShortUrl(data,url,token=''){
-  const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.code===data?.code);
-  if(b){
-    b.shareToken=token||'';
-    b.shareUrl=url;
-    b.shareSignature=permitSignature(data);
-    saveState();
+function validGuestData(data){
+  if(!data?.spots?.length){alert('اختر موقفاً');return false}
+  if(!data.room){alert('أدخل رقم الغرفة');return false}
+  if(new Date(data.end)<=new Date(data.start)||new Date(data.end)<=new Date()){
+    alert('تأكد أن نهاية التصريح بعد البداية وفي المستقبل');return false
   }
+  return true
 }
-async function prepareShareLink(data){
-  const cached=cachedShortUrl(data);
-  if(cached)return cached;
-  const longUrl=createFallbackGuestLink(data);
-  try{
-    const url=await shortenFast(longUrl);
-    storeShortUrl(data,url);
-    return url;
-  }catch(e){
-    return null;
-  }
+function textToB64Url(text){
+  const bytes=new TextEncoder().encode(text);
+  let bin='';
+  for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')
 }
-function rememberShare(data,url,token=''){storeShortUrl(data,url,token)}
-async function createGuestLink(){
+function b64UrlToText(token){
+  let s=String(token||'').replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  const bin=atob(s),bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes)
+}
+function encodeCompactPermit(o){
+  const ss=(o.spots||[]).map(n=>Number(n));
+  const spotKey=ss.map(n=>n.toString(36)).join('');
+  const plateList=ss.map(n=>String(o.plates?.[n]??o.plates?.[String(n)]??''));
+  const startMin=Math.floor(new Date(o.start).getTime()/60000).toString(36);
+  const endMin=Math.floor(new Date(o.end).getTime()/60000).toString(36);
+  return textToB64Url(JSON.stringify([1,String(o.room||''),spotKey,plateList,startMin,endMin]))
+}
+function decodeCompactPermit(token){
+  const a=JSON.parse(b64UrlToText(token));
+  if(!Array.isArray(a)||a[0]!==1)throw new Error('bad version');
+  const room=String(a[1]||'');
+  const spots=[...String(a[2]||'')].map(ch=>parseInt(ch,36)).filter(n=>Number.isInteger(n)&&n>=1&&n<=20);
+  if(!room||!spots.length)throw new Error('bad data');
+  const list=Array.isArray(a[3])?a[3]:[];
+  const plates={};spots.forEach((n,i)=>plates[n]=String(list[i]||''));
+  const startMs=parseInt(String(a[4]),36)*60000,endMs=parseInt(String(a[5]),36)*60000;
+  if(!Number.isFinite(startMs)||!Number.isFinite(endMs)||endMs<=startMs)throw new Error('bad dates');
+  return {room,spots,plates,start:new Date(startMs).toISOString(),end:new Date(endMs).toISOString(),code:permitCode(room,spots)}
+}
+function compactGuestLink(data){
+  return PUBLIC_PERMIT_BASE+'?d='+encodeURIComponent(encodeCompactPermit(data))
+}
+function rememberShare(data,url){
+  const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.code===data?.code);
+  if(b){b.shareUrl=url;b.shareToken='';b.shareSignature='compact-v1';saveState()}
+}
+function prepareShareLink(data){
+  try{return Promise.resolve(compactGuestLink(data))}catch(e){return Promise.reject(e)}
+}
+function createGuestLink(){
   const data=permitDataFromCurrent();
   if(!validGuestData(data))return null;
-  const cached=cachedShortUrl(data);
-  if(cached){
-    $('linkMsg').textContent='الرابط المختصر جاهز ✓';
-    renderPermitWithQR(data,cached);
-    return cached;
-  }
-  $('linkMsg').textContent='جاري تجهيز الرابط المختصر...';
-  const session=await getReceptionSession();
-  if(session&&db){
-    try{
-      const {data:token,error}=await db.rpc('create_parking_permit_share',{
-        p_room_no:data.room,
-        p_permit_code:data.code||permitCode(data.room,data.spots),
-        p_valid_from:new Date(data.start).toISOString(),
-        p_valid_until:new Date(data.end).toISOString(),
-        p_spots:data.spots,
-        p_plates:data.plates||{}
-      });
-      if(!error&&token){
-        const url=PUBLIC_PERMIT_BASE+'?p='+encodeURIComponent(token);
-        $('linkMsg').textContent='الرابط المختصر جاهز ✓';
-        rememberShare(data,url,token);
-        renderPermitWithQR(data,url);
-        return url;
-      }
-    }catch(e){}
-  }
-  const url=await prepareShareLink(data);
-  if(!url){
-    $('linkMsg').textContent='تعذر إنشاء رابط مختصر الآن. حاول مرة ثانية بعد ثوانٍ.';
-    return null;
-  }
-  $('linkMsg').textContent='الرابط المختصر جاهز ✓';
+  const url=compactGuestLink(data);
+  $('linkMsg').textContent='رابط التصريح جاهز ✓';
+  rememberShare(data,url);
   renderPermitWithQR(data,url);
-  return url;
+  return url
 }
-function renderPermitWithQR(data,url){$('permitHost').innerHTML=permitHTML(data,url);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode){q.innerHTML='';new QRCode(q,{text:url,width:128,height:128})}},20)}
-async function sharePermit(){
+function renderPermitWithQR(data,url){
+  $('permitHost').innerHTML=permitHTML(data,url);
+  setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode){q.innerHTML='';new QRCode(q,{text:url,width:128,height:128})}},20)
+}
+function sharePermit(){
   const data=permitDataFromCurrent();
   if(!validGuestData(data))return;
-  let url=cachedShortUrl(data);
-  if(!url)url=await createGuestLink();
-  if(!url){
-    alert('تعذر تجهيز الرابط المختصر الآن. حاول مرة ثانية بعد ثوانٍ.');
-    return;
+  const url=compactGuestLink(data);
+  rememberShare(data,url);
+  renderPermitWithQR(data,url);
+  $('linkMsg').textContent='رابط التصريح جاهز ✓';
+  const msg=`تصريح موقف ديار المدينة\nالغرفة: ${data.room||'-'}\nرقم التصريح: ${data.code||permitCode(data.room,data.spots)}\n${url}`;
+  if(navigator.share){
+    navigator.share({title:'تصريح موقف ديار المدينة',text:msg,url}).catch(e=>{
+      if(e?.name==='AbortError')return;
+      window.location.href='https://wa.me/?text='+encodeURIComponent(msg)
+    });
+    return
   }
-  const msg=`تصريح موقف ديار المدينة\nالغرفة: ${data.room||'-'}\nرقم التصريح: ${data.code||'-'}\n${url}`;
-  window.location.href='https://wa.me/?text='+encodeURIComponent(msg);
+  window.location.href='https://wa.me/?text='+encodeURIComponent(msg)
 }
-async function guestMode(){const params=new URLSearchParams(location.search),shortToken=params.get('p'),legacy=params.get('permit');if(!shortToken&&!legacy)return false;$('staffView').classList.add('hidden');$('staffTopbar')?.classList.add('hidden');$('guestView').classList.remove('hidden');if(shortToken){$('guestView').innerHTML='<div class="panel"><div class="title">جاري التحقق من التصريح...</div></div>';if(!db){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:shortToken});if(error||!data||!data.length){$('guestView').innerHTML='<div class="panel"><div class="title">التصريح غير صالح أو انتهت صلاحيته</div></div>';return true}const r=data[0],d={room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:(r.spots||[]).map(Number),plates:r.plates||{}};$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}}try{const d=decodePermit(legacy);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch{$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}
+async function guestMode(){const params=new URLSearchParams(location.search),compact=params.get('d'),shortToken=params.get('p'),legacy=params.get('permit');if(!compact&&!shortToken&&!legacy)return false;$('staffView').classList.add('hidden');$('staffTopbar')?.classList.add('hidden');$('guestView').classList.remove('hidden');if(compact){try{const d=decodeCompactPermit(compact);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}if(shortToken){$('guestView').innerHTML='<div class="panel"><div class="title">جاري التحقق من التصريح...</div></div>';if(!db){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:shortToken});if(error||!data||!data.length){$('guestView').innerHTML='<div class="panel"><div class="title">التصريح غير صالح أو انتهت صلاحيته</div></div>';return true}const r=data[0],d={room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:(r.spots||[]).map(Number),plates:r.plates||{}};$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}}try{const d=decodePermit(legacy);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch{$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 window.addEventListener('storage',()=>{bookings=loadJSON(STORAGE_KEY,[]);logs=loadJSON(LOG_KEY,[]);renderAll()});
 
