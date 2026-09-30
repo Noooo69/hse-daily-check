@@ -45,7 +45,7 @@ function formPlates(){if($('multi').checked){const o={};selected.forEach(n=>o[n]
 function permitCode(room,ss){return 'PK-'+(room||'ROOM')+'-'+ss.map(pad).join('')}
 function collectForm(){return{room:$('room').value.trim(),spots:[...selected],plates:formPlates(),start:$('start').value,end:$('end').value,status:$('status').value,amount:$('amount').value,paid:$('paid').value,notes:$('notes').value,issueReason:($('status').value==='maintenance'||$('status').value==='problem')?$('issueReason').value:'',code:permitCode($('room').value.trim(),selected)}}
 function validateData(d){if(!d.spots.length){alert('اختر موقفاً');return false}if(!d.room){alert('أدخل رقم الغرفة');return false}if(new Date(d.end)<=new Date(d.start)){alert('تاريخ المغادرة يجب أن يكون بعد البداية');return false}const conflict=d.spots.find(n=>{const b=bookingForSpot(n);return b&&b.id!==currentEditId});if(conflict){alert(`الموقف ${pad(conflict)} مستخدم حالياً`);return false}return true}
-function saveBooking(){const d=collectForm();if(!validateData(d))return;let b;if(currentEditId){b=bookings.find(x=>x.id===currentEditId);Object.assign(b,d,{updatedAt:new Date().toISOString(),shareUrl:'',shareToken:'',shareSignature:''});addLog('تعديل حجز',b,b.issueReason||'')}else{b={...d,id:'B'+Date.now(),active:true,entryConfirmed:false,shareUrl:'',shareToken:'',shareSignature:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};bookings.unshift(b);addLog('إنشاء حجز',b,b.issueReason||'')}saveState();currentEditId=b.id;renderAll();previewPermit(b);alert('تم حفظ الحجز')}
+function saveBooking(){const d=collectForm();if(!validateData(d))return;let b;if(currentEditId){b=bookings.find(x=>x.id===currentEditId);Object.assign(b,d,{updatedAt:new Date().toISOString(),shareUrl:'',shareToken:'',shareSignature:''});addLog('تعديل حجز',b,b.issueReason||'')}else{b={...d,id:'B'+Date.now(),active:true,entryConfirmed:false,shareUrl:'',shareToken:'',shareSignature:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};bookings.unshift(b);addLog('إنشاء حجز',b,b.issueReason||'')}saveState();currentEditId=b.id;renderAll();previewPermit(b);prepareShareLink(b).catch(()=>{});alert('تم حفظ الحجز')}
 function editBooking(id){const b=bookings.find(x=>x.id===id);if(!b)return;currentEditId=id;selected=[...b.spots];$('multi').checked=b.spots.length>1;$('room').value=b.room;$('plate').value=b.plates[b.spots[0]]||'';$('start').value=b.start;$('end').value=b.end;$('status').value=b.status;$('amount').value=b.amount||'';$('paid').value=b.paid||'';$('notes').value=b.notes||'';toggleIssueReason();if(b.issueReason)$('issueReason').value=b.issueReason;renderPlateInputs();if(b.spots.length>1)b.spots.forEach(n=>{const el=$(`mplate${n}`);if(el)el.value=b.plates[n]||''});switchTab('reception');renderSpots();window.scrollTo({top:document.querySelector('.formPanel').offsetTop-20,behavior:'smooth'})}
 function clearForm(){currentEditId=null;selected=[3];$('multi').checked=false;$('room').value='';$('plate').value='';$('notes').value='';$('amount').value='50';$('paid').value='50';$('status').value='occupied';toggleIssueReason();initDates();renderPlateInputs();renderSpots();$('permitHost').innerHTML=''}
 function checkout(id){const b=bookings.find(x=>x.id===id);if(!b||!confirm(`تأكيد مغادرة الغرفة ${b.room} وتحرير الموقف؟`))return;b.active=false;b.checkoutAt=new Date().toISOString();addLog('مغادرة النزيل',b);saveState();renderAll();if(b.shareToken&&db)db.rpc('revoke_parking_permit_share',{p_token:b.shareToken}).catch(()=>{});if(currentEditId===id)clearForm()}
@@ -116,41 +116,125 @@ function decodeCompactPermit(token){
 function compactGuestLink(data){
   return PUBLIC_PERMIT_BASE+'?d='+encodeURIComponent(encodeCompactPermit(data))
 }
-function rememberShare(data,url){
-  const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.code===data?.code);
-  if(b){b.shareUrl=url;b.shareToken='';b.shareSignature='compact-v1';saveState()}
+function permitShareSignature(data){
+  return JSON.stringify({
+    id:String(data?.id||currentEditId||''),
+    room:String(data?.room||''),
+    spots:(data?.spots||[]).map(Number),
+    plates:data?.plates||{},
+    start:String(data?.start||''),
+    end:String(data?.end||''),
+    code:String(data?.code||permitCode(data?.room||'',data?.spots||[]))
+  })
 }
-function prepareShareLink(data){
-  try{return Promise.resolve(compactGuestLink(data))}catch(e){return Promise.reject(e)}
+function cachedSupabaseShare(data){
+  const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.id===currentEditId)||bookings.find(x=>x.code===data?.code);
+  if(!b||b.shareSignature!==permitShareSignature(data))return '';
+  const u=String(b.shareUrl||'');
+  return /\/p\/?\?p=/i.test(u)?u:''
 }
-function createGuestLink(){
+function rememberShare(data,url,token=''){
+  const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.id===currentEditId)||bookings.find(x=>x.code===data?.code);
+  if(b){
+    b.shareUrl=url;
+    b.shareToken=token||'';
+    b.shareSignature=permitShareSignature(data);
+    saveState()
+  }
+}
+function withTimeout(promise,ms=6500){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms))
+  ])
+}
+let shareLinkPromise=null;
+let shareLinkPromiseSignature='';
+async function createSupabaseShare(data,{promptLogin=false}={}){
+  const cached=cachedSupabaseShare(data);
+  if(cached)return cached;
+
+  const session=await getReceptionSession();
+  if(!session){
+    if(promptLogin){
+      openAuthModal();
+      $('authMsg').textContent='سجّل دخول الاستقبال مرة واحدة، ثم اضغط مشاركة مرة ثانية.';
+      $('linkMsg').textContent='مطلوب تسجيل دخول الاستقبال لإنشاء الرابط القصير الآمن.';
+    }
+    return null
+  }
+
+  const sig=permitShareSignature(data);
+  if(shareLinkPromise&&shareLinkPromiseSignature===sig)return shareLinkPromise;
+
+  shareLinkPromiseSignature=sig;
+  shareLinkPromise=(async()=>{
+    try{
+      $('linkMsg').textContent='جاري إنشاء الرابط القصير...';
+      const bookingRef=String(data.id||currentEditId||data.code||permitCode(data.room,data.spots));
+      const {data:token,error}=await withTimeout(
+        db.rpc('create_parking_permit_share_v2',{
+          p_booking_ref:bookingRef,
+          p_room_no:data.room,
+          p_permit_code:data.code||permitCode(data.room,data.spots),
+          p_valid_from:new Date(data.start).toISOString(),
+          p_valid_until:new Date(data.end).toISOString(),
+          p_spots:data.spots,
+          p_plates:data.plates||{}
+        }),
+        6500
+      );
+      if(error)throw error;
+      if(!token)throw new Error('no token');
+      const url=PUBLIC_PERMIT_BASE+'?p='+encodeURIComponent(token);
+      rememberShare(data,url,token);
+      $('linkMsg').textContent='الرابط القصير جاهز ✓';
+      renderPermitWithQR(data,url);
+      return url
+    }catch(e){
+      console.error('Parking share:',e);
+      $('linkMsg').textContent=e?.message==='timeout'
+        ?'تأخر الاتصال بخدمة التصاريح. حاول مرة أخرى.'
+        :'تعذر إنشاء رابط التصريح. تحقق من تسجيل الدخول ثم حاول مرة أخرى.';
+      return null
+    }finally{
+      if(shareLinkPromiseSignature===sig){
+        shareLinkPromise=null;
+        shareLinkPromiseSignature=''
+      }
+    }
+  })();
+  return shareLinkPromise
+}
+async function prepareShareLink(data){
+  if(!data?.spots?.length||!data?.room)return null;
+  return createSupabaseShare(data,{promptLogin:false})
+}
+async function createGuestLink(){
   const data=permitDataFromCurrent();
   if(!validGuestData(data))return null;
-  const url=compactGuestLink(data);
-  $('linkMsg').textContent='رابط التصريح جاهز ✓';
-  rememberShare(data,url);
-  renderPermitWithQR(data,url);
+  const url=await createSupabaseShare(data,{promptLogin:true});
+  if(url){
+    try{await navigator.clipboard?.writeText(url)}catch(e){}
+  }
   return url
 }
 function renderPermitWithQR(data,url){
   $('permitHost').innerHTML=permitHTML(data,url);
-  setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode){q.innerHTML='';new QRCode(q,{text:url,width:128,height:128})}},20)
+  setTimeout(()=>{
+    const q=$('permitQR');
+    if(q&&window.QRCode){
+      q.innerHTML='';
+      new QRCode(q,{text:url,width:128,height:128})
+    }
+  },20)
 }
-function sharePermit(){
+async function sharePermit(){
   const data=permitDataFromCurrent();
   if(!validGuestData(data))return;
-  const url=compactGuestLink(data);
-  rememberShare(data,url);
-  renderPermitWithQR(data,url);
-  $('linkMsg').textContent='رابط التصريح جاهز ✓';
+  const url=await createSupabaseShare(data,{promptLogin:true});
+  if(!url)return;
   const msg=`تصريح موقف ديار المدينة\nالغرفة: ${data.room||'-'}\nرقم التصريح: ${data.code||permitCode(data.room,data.spots)}\n${url}`;
-  if(navigator.share){
-    navigator.share({title:'تصريح موقف ديار المدينة',text:msg,url}).catch(e=>{
-      if(e?.name==='AbortError')return;
-      window.location.href='https://wa.me/?text='+encodeURIComponent(msg)
-    });
-    return
-  }
   window.location.href='https://wa.me/?text='+encodeURIComponent(msg)
 }
 async function guestMode(){const params=new URLSearchParams(location.search),compact=params.get('d'),shortToken=params.get('p'),legacy=params.get('permit');if(!compact&&!shortToken&&!legacy)return false;$('staffView').classList.add('hidden');$('staffTopbar')?.classList.add('hidden');$('guestView').classList.remove('hidden');if(compact){try{const d=decodeCompactPermit(compact);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}if(shortToken){$('guestView').innerHTML='<div class="panel"><div class="title">جاري التحقق من التصريح...</div></div>';if(!db){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}try{const {data,error}=await db.rpc('get_parking_permit_share',{p_token:shortToken});if(error||!data||!data.length){$('guestView').innerHTML='<div class="panel"><div class="title">التصريح غير صالح أو انتهت صلاحيته</div></div>';return true}const r=data[0],d={room:r.room_no,code:r.permit_code,start:r.valid_from,end:r.valid_until,spots:(r.spots||[]).map(Number),plates:r.plates||{}};$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch(e){$('guestView').innerHTML='<div class="panel"><div class="title">تعذر الاتصال بخدمة التحقق حالياً</div></div>';return true}}try{const d=decodePermit(legacy);if(new Date(d.end)<=new Date()){$('guestView').innerHTML='<div class="panel"><div class="title">انتهت صلاحية التصريح</div></div>';return true}$('guestView').innerHTML=permitHTML(d,location.href);setTimeout(()=>{const q=$('permitQR');if(q&&window.QRCode)new QRCode(q,{text:location.href,width:128,height:128})},20);return true}catch{$('guestView').innerHTML='<div class="panel"><div class="title">رابط التصريح غير صالح</div></div>';return true}}
