@@ -45,7 +45,7 @@ function formPlates(){if($('multi').checked){const o={};selected.forEach(n=>o[n]
 function permitCode(room,ss){return 'PK-'+(room||'ROOM')+'-'+ss.map(pad).join('')}
 function collectForm(){return{room:$('room').value.trim(),spots:[...selected],plates:formPlates(),start:$('start').value,end:$('end').value,status:$('status').value,amount:$('amount').value,paid:$('paid').value,notes:$('notes').value,issueReason:($('status').value==='maintenance'||$('status').value==='problem')?$('issueReason').value:'',code:permitCode($('room').value.trim(),selected)}}
 function validateData(d){if(!d.spots.length){alert('اختر موقفاً');return false}if(!d.room){alert('أدخل رقم الغرفة');return false}if(new Date(d.end)<=new Date(d.start)){alert('تاريخ المغادرة يجب أن يكون بعد البداية');return false}const conflict=d.spots.find(n=>{const b=bookingForSpot(n);return b&&b.id!==currentEditId});if(conflict){alert(`الموقف ${pad(conflict)} مستخدم حالياً`);return false}return true}
-function saveBooking(){const d=collectForm();if(!validateData(d))return;let b;if(currentEditId){b=bookings.find(x=>x.id===currentEditId);Object.assign(b,d,{updatedAt:new Date().toISOString()});addLog('تعديل حجز',b,b.issueReason||'')}else{b={...d,id:'B'+Date.now(),active:true,entryConfirmed:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};bookings.unshift(b);addLog('إنشاء حجز',b,b.issueReason||'')}saveState();currentEditId=b.id;renderAll();previewPermit(b);prepareShareLink(b).then(url=>{if(url&&currentEditId===b.id)$('linkMsg').textContent='الرابط المختصر جاهز ✓'}).catch(()=>{});alert('تم حفظ الحجز')}
+function saveBooking(){const d=collectForm();if(!validateData(d))return;let b;if(currentEditId){b=bookings.find(x=>x.id===currentEditId);Object.assign(b,d,{updatedAt:new Date().toISOString(),shareUrl:'',shareToken:'',shareSignature:''});addLog('تعديل حجز',b,b.issueReason||'')}else{b={...d,id:'B'+Date.now(),active:true,entryConfirmed:false,shareUrl:'',shareToken:'',shareSignature:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};bookings.unshift(b);addLog('إنشاء حجز',b,b.issueReason||'')}saveState();currentEditId=b.id;renderAll();previewPermit(b);prepareShareLink(b).then(url=>{if(url&&currentEditId===b.id)$('linkMsg').textContent='الرابط المختصر جاهز ✓'}).catch(()=>{});alert('تم حفظ الحجز')}
 function editBooking(id){const b=bookings.find(x=>x.id===id);if(!b)return;currentEditId=id;selected=[...b.spots];$('multi').checked=b.spots.length>1;$('room').value=b.room;$('plate').value=b.plates[b.spots[0]]||'';$('start').value=b.start;$('end').value=b.end;$('status').value=b.status;$('amount').value=b.amount||'';$('paid').value=b.paid||'';$('notes').value=b.notes||'';toggleIssueReason();if(b.issueReason)$('issueReason').value=b.issueReason;renderPlateInputs();if(b.spots.length>1)b.spots.forEach(n=>{const el=$(`mplate${n}`);if(el)el.value=b.plates[n]||''});switchTab('reception');renderSpots();prepareShareLink(b).catch(()=>{});window.scrollTo({top:document.querySelector('.formPanel').offsetTop-20,behavior:'smooth'})}
 function clearForm(){currentEditId=null;selected=[3];$('multi').checked=false;$('room').value='';$('plate').value='';$('notes').value='';$('amount').value='50';$('paid').value='50';$('status').value='occupied';toggleIssueReason();initDates();renderPlateInputs();renderSpots();$('permitHost').innerHTML=''}
 function checkout(id){const b=bookings.find(x=>x.id===id);if(!b||!confirm(`تأكيد مغادرة الغرفة ${b.room} وتحرير الموقف؟`))return;b.active=false;b.checkoutAt=new Date().toISOString();addLog('مغادرة النزيل',b);saveState();renderAll();if(b.shareToken&&db)db.rpc('revoke_parking_permit_share',{p_token:b.shareToken}).catch(()=>{});if(currentEditId===id)clearForm()}
@@ -93,14 +93,31 @@ async function shortenFast(longUrl){
     shortenJsonp('v.gd',longUrl,2600)
   ]);
 }
+function permitSignature(data){
+  return JSON.stringify({
+    room:String(data?.room||''),
+    spots:(data?.spots||[]).map(Number),
+    plates:data?.plates||{},
+    start:String(data?.start||''),
+    end:String(data?.end||''),
+    code:String(data?.code||permitCode(data?.room||'',data?.spots||[]))
+  });
+}
 function cachedShortUrl(data){
   const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.code===data?.code);
-  const u=b?.shareUrl||'';
+  if(!b)return '';
+  const u=b.shareUrl||'';
+  if(b.shareSignature!==permitSignature(data))return '';
   return /^https:\/\/(is\.gd|v\.gd)\//i.test(u)||/[?&]p=/.test(u)?u:'';
 }
 function storeShortUrl(data,url,token=''){
   const b=(data?.id&&bookings.find(x=>x.id===data.id))||bookings.find(x=>x.code===data?.code);
-  if(b){b.shareToken=token||'';b.shareUrl=url;saveState()}
+  if(b){
+    b.shareToken=token||'';
+    b.shareUrl=url;
+    b.shareSignature=permitSignature(data);
+    saveState();
+  }
 }
 async function prepareShareLink(data){
   const cached=cachedShortUrl(data);
