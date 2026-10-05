@@ -37,18 +37,14 @@ create index if not exists h360_reception_stays_v167_confirmation_idx
 
 alter table public.h360_reception_stays_v167 enable row level security;
 
+-- Property-scoped access: reuse the v166 hotel authorization helper.
 drop policy if exists h360_reception_stays_v167_auth_select on public.h360_reception_stays_v167;
 drop policy if exists h360_reception_stays_v167_auth_insert on public.h360_reception_stays_v167;
 drop policy if exists h360_reception_stays_v167_auth_update on public.h360_reception_stays_v167;
+drop policy if exists h360_reception_stays_v167_hotel_staff on public.h360_reception_stays_v167;
 
-create policy h360_reception_stays_v167_auth_select
-on public.h360_reception_stays_v167 for select
-to authenticated using (true);
-
-create policy h360_reception_stays_v167_auth_insert
-on public.h360_reception_stays_v167 for insert
-to authenticated with check (true);
-
-create policy h360_reception_stays_v167_auth_update
-on public.h360_reception_stays_v167 for update
-to authenticated using (true) with check (true);
+create policy h360_reception_stays_v167_hotel_staff
+on public.h360_reception_stays_v167 for all
+to authenticated
+using (public.h360_v166_can_hotel(local_hotel_id))
+with check (public.h360_v166_can_hotel(local_hotel_id));
