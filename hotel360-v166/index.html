@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hotel360 v166</title>
+<style>
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:#07120f;color:#fff}.wrap{min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}.card{width:min(520px,100%);background:#10231d;border:1px solid #2a5143;border-radius:24px;padding:28px;box-sizing:border-box;text-align:center;box-shadow:0 20px 70px #0008}.logo{font-size:30px;font-weight:800;margin-bottom:10px}.sub{opacity:.78;line-height:1.8}.bar{height:10px;background:#081511;border-radius:999px;overflow:hidden;margin:22px 0 12px}.bar>i{display:block;height:100%;width:8%;background:#d9ae62;border-radius:999px;transition:width .25s}.small{font-size:13px;opacity:.7}.err{display:none;margin-top:18px;padding:14px;border-radius:14px;background:#431b1b;color:#ffd9d9;text-align:right;line-height:1.7}button{border:0;border-radius:12px;padding:12px 18px;font-weight:700;margin-top:12px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card"><div class="logo">Hotel360 <span style="color:#d9ae62">v166</span></div><div class="sub" id="msg">جاري تجهيز نظام الحجوزات الاحترافي…</div><div class="bar"><i id="bar"></i></div><div class="small" id="small">تحميل ملفات النظام</div><div class="err" id="err"></div><button id="retry" onclick="location.reload()">إعادة المحاولة</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+(async()=>{
+ const msg=document.getElementById('msg'),bar=document.getElementById('bar'),small=document.getElementById('small'),err=document.getElementById('err'),retry=document.getElementById('retry');
+ const set=(t,p,s)=>{msg.textContent=t;if(p!=null)bar.style.width=p+'%';if(s)small.textContent=s};
+ const fail=e=>{console.error(e);msg.textContent='تعذر تشغيل Hotel360';bar.style.width='100%';bar.style.background='#b94b4b';err.style.display='block';err.textContent='السبب: '+(e&&e.message?e.message:String(e))+'\n\nتأكد من اتصال الإنترنت ثم أعد المحاولة.';retry.style.display='inline-block'};
+ try{
+   if(!window.JSZip) throw new Error('تعذر تحميل أداة فك الملفات');
+   set('جاري تحميل Hotel360 v166…',15,'تحميل الحزمة من GitHub');
+   const zipUrl='https://raw.githubusercontent.com/Noooo69/hse-daily-check/86036747266ebfa57d914c44678c6ad8297cefb5/hotel360-v166-professional-reservations-core.zip';
+   const r=await fetch(zipUrl,{cache:'no-store'}); if(!r.ok) throw new Error('تعذر تحميل الحزمة: '+r.status);
+   const buf=await r.arrayBuffer(); set('جاري فتح ملفات النظام…',35,'فك الحزمة');
+   const z=await JSZip.loadAsync(buf);
+   const idx=z.file('index.html'); if(!idx) throw new Error('index.html غير موجود داخل الحزمة');
+   let html=await idx.async('string');
+   set('جاري تجهيز الواجهة…',52,'دمج ملفات الحجوزات');
+   const css=z.file('v166-reservations.css'); if(css){const c=await css.async('string');html=html.replace(/<link[^>]+href=["']v166-reservations\.css["'][^>]*>/i,'<style>'+c+'</style>')}
+   const js=z.file('v166-reservations.js'); if(js){const j=await js.async('string');html=html.replace(/<script[^>]+src=["']v166-reservations\.js["'][^>]*><\/script>/i,'<script>'+j+'<\/script>')}
+   const imgs=Object.keys(z.files).filter(n=>/^images\/.+\.(?:jpg|jpeg|png|webp|gif)$/i.test(n));
+   const map={}; let done=0;
+   for(const n of imgs){const ext=n.split('.').pop().toLowerCase();const mime=ext==='png'?'image/png':ext==='webp'?'image/webp':ext==='gif'?'image/gif':'image/jpeg';map[n]='data:'+mime+';base64,'+await z.file(n).async('base64');done++;if(done%8===0)set('جاري تجهيز الصور والبيانات…',55+Math.round(done/imgs.length*35),'تجهيز '+done+' من '+imgs.length)}
+   html=html.replace(/images\/[A-Za-z0-9_.-]+\.(?:jpg|jpeg|png|webp|gif)/gi,m=>map[m]||m);
+   set('تم التجهيز — فتح Hotel360…',96,'لحظات');
+   sessionStorage.setItem('hotel360_v166_loader_ok','1');
+   document.open();document.write(html);document.close();
+ }catch(e){fail(e)}
+})();
+</script>
+</body>
+</html>
