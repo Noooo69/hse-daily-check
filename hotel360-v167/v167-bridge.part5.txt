@@ -1,0 +1,37 @@
+kedCheckin(r);repaint();};
+window.v167SyncReceptionCloud=async function(){let sb=typeof sbClient!=='undefined'?sbClient:null;if(!sb||typeof supabaseReady!=='function'||!supabaseReady())return alert('Supabase غير متصل. الربط المحلي يعمل، وللمزامنة السحابية شغّل إعداد Supabase أولًا.');try{let rows=(state.checkins||[]).filter(c=>c.reservationId).map(c=>({id:c.id,reservation_id:c.reservationId,local_hotel_id:String(c.hotelId||currentHotelId()),confirmation_no:c.confirmationNo||null,status:c.status,total:n(c.total),paid_amount:n(c.paidAmount),payment_status:c.paymentStatus||null,payer_type:c.payerType||null,payload:c,updated_at:iso()}));if(rows.length){let {error}=await sb.from('h360_reception_stays_v167').upsert(rows,{onConflict:'id'});if(error)throw error;}V().lastSync=iso();saveNow();alert('تمت مزامنة سجلات التسكين المرتبطة بالحجوزات: '+rows.length);}catch(e){alert('تعذر مزامنة v167. شغّل ملف SUPABASE_V167_RECEPTION_PAYMENT_BRIDGE.sql أولًا.\n'+(e.message||e));}};
+
+// Add the new reception tab without disturbing the old reception pages.
+const oldReceptionContent=window.receptionPageContent;
+window.receptionPageContent=function(){if(state.receptionTab==='arrivals167')return arrivalsView();return oldReceptionContent?oldReceptionContent():'';};
+const oldSetReceptionTab=window.v64SetReceptionTab;
+window.v64SetReceptionTab=function(tab){if(tab==='arrivals167'){state.receptionTab='arrivals167';saveNow();render();return;}return oldSetReceptionTab?oldSetReceptionTab(tab):null;};
+const oldReception=window.reception;
+window.reception=function(){let html=oldReception?oldReception():'';let count=arrivalRows(today()).filter(r=>!rChecked(r)).length;let btn=`<button type="button" class="btn tiny ${state.receptionTab==='arrivals167'?'primary':'ghost'}" onclick="v64SetReceptionTab('arrivals167')">دخول اليوم <span class="v167-badge-count">${count}</span></button>`;return html.replace('<div class="reception-tabs">','<div class="reception-tabs">'+btn);};
+const oldDash=window.receptionDashboardView;
+window.receptionDashboardView=function(){return dashboardStrip()+(oldDash?oldDash():'');};
+
+// Wrap reservation creation so company/group/payer data is written at creation time.
+const oldCreate=window.v166CreateFromCart;
+window.v166CreateFromCart=function(){let t=document.getElementById('v167BookingType')?.value||'individual',p=document.getElementById('v167PayerType')?.value||'guest',cid=document.getElementById('v167CompanyId')?.value||'',gid=document.getElementById('v167GroupId')?.value||'';if(t==='company'&&!cid)return alert('اختر الشركة قبل إنشاء حجز شركة.');if(t==='group'&&!gid)return alert('اختر القروب قبل إنشاء حجز قروب.');if(p==='company'&&!cid)return alert('جهة الدفع شركة؛ اختر الشركة.');if(p==='group_master'&&!gid)return alert('جهة الدفع حساب رئيسي للقروب؛ اختر القروب.');let before=new Set((S().reservations||[]).map(r=>r.id));let out=oldCreate?oldCreate():null;let r=(S().reservations||[]).find(x=>!before.has(x.id));if(r){r.bookingType=t;r.payerType=p;r.companyId=cid||null;r.groupId=gid||null;r.payerName=payerName(r);if(t==='company'&&(!r.source||r.source==='هاتف'))r.source='شركة';if(t==='group'&&(!r.source||r.source==='هاتف'))r.source='مجموعة';r.updatedAt=iso();audit(r,'تثبيت نوع الحجز وجهة الدفع عند الإنشاء',{bookingType:t,payerType:p,companyId:r.companyId,groupId:r.groupId});saveNow();try{render()}catch(e){}}return out;};
+
+// Mark payments recorded in the reservations center and mirror them to reception.
+const oldAddPayment=window.v166AddPayment;
+window.v166AddPayment=function(id){let r=resBy(id),before=new Set((r?.payments||[]).map(p=>p.id));let out=oldAddPayment?oldAddPayment(id):null;if(r){(r.payments||[]).filter(p=>!before.has(p.id)).forEach(p=>{p.source='reservations';p.actor=typeof displayUserName==='function'?displayUserName():'مستخدم';});syncLinkedCheckin(r);saveNow();}return out;};
+
+// If reception edits a linked payment, update the shared reservation ledger instead of diverging.
+const oldEditPayment=window.v74EditPayment;
+window.v74EditPayment=function(id){let c=(state.checkins||[]).find(x=>x.id===id),r=c?.reservationId?resBy(c.reservationId):null;if(!r)return oldEditPayment?oldEditPayment(id):null;if(!canReception())return alert('ليس لديك صلاحية تعديل الدفع.');let method=prompt('طريقة الدفع',c.paymentMethod||paymentMethod(r));if(method===null)return;let target=n(prompt('إجمالي المبلغ المدفوع المطلوب بعد التعديل',String(paidTotal(r))));if(target<0)return alert('المبلغ غير صحيح.');let total=reservationTotal(r);target=Math.min(target,total);let cur=paidTotal(r);if(target>cur)addPayment(r,target-cur,method,'تعديل استقبال','reception');else if(target<cur)refundToTarget(r,target,method,'reception');c.paymentMethod=method;syncLinkedCheckin(r);try{if(typeof v74Audit==='function')v74Audit(c,'تعديل دفع مرتبط بالحجز',[{field:'المدفوع',old:money(cur),new:money(target)}],'دفتر دفع موحد v167')}catch(e){}repaint();};
+
+// Keep total charges and stay dates aligned after reception changes a linked stay.
+['v74AdjustCharge','v74ExtendStay'].forEach(name=>{let old=window[name];if(typeof old!=='function')return;window[name]=function(id){let out=old.apply(this,arguments),c=(state.checkins||[]).find(x=>x.id===id);if(c?.reservationId){syncReservationFromCheckin(c);let r=resBy(c.reservationId);if(r)audit(r,'تحديث إجمالي الإقامة من الاستقبال',{total:n(c.total),expectedCheckOut:c.expectedCheckOut});saveNow();}return out;};});
+
+// Keep reservation status aligned on checkout and stop accidental unpaid guest checkout.
+const oldCheckout=window.checkoutGuest;
+window.checkoutGuest=function(id){let c=(state.checkins||[]).find(x=>x.id===id),r=c?.reservationId?resBy(c.reservationId):null;if(r){syncReservationFromCheckin(c);let b=balance(r),p=payerType(r);if(b>0&&p==='guest')return alert('لا يمكن إنهاء مغادرة هذا الحجز قبل تسوية المتبقي '+money(b)+'. افتح الدفع ثم أكمل المغادرة.');if(b>0&&p!=='guest'&&!confirm('يوجد رصيد '+money(b)+' مستحق على '+payerName(r)+'. هل تريد المغادرة مع إبقاء الرصيد على الحساب الرئيسي؟'))return;}let before=c?.status,out=oldCheckout?oldCheckout(id):null;if(r&&c&&before!=='out'&&c.status==='out'){r.status='checked_out';r.checkedOutAt=iso();r.updatedAt=iso();r.finalTotal=n(c.total);audit(r,'تم Check-out من الاستقبال',{checkinId:c.id,total:r.finalTotal,balance:balance(r),payer:payerName(r)});saveNow();try{render()}catch(e){}}return out;};
+
+// Observe rerenders of the reservation center and inject v167 fields/panel.
+let observer=null;try{observer=new MutationObserver(scheduleInject);observer.observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+const oldRender=window.render;if(typeof oldRender==='function'){window.render=function(){let out=oldRender.apply(this,arguments);scheduleInject();return out;};}
+try{ensure();saveNow();scheduleInject();}catch(e){console.error('v167 init failed',e);}
+})();
