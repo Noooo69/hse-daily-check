@@ -1,0 +1,50 @@
+/* Hotel360 v167 — Full Reservations ↔ Reception ↔ Payments Bridge
+   Builds on v166 without replacing legacy check-in, issues, permissions, owner center, or purchasing logic.
+*/
+(function(){
+'use strict';
+const VERSION=167;
+const CLOSED=new Set(['cancelled','no_show','checked_out','expired','lost']);
+const ARRIVAL_READY=new Set(['confirmed','due_in']);
+const CHECKED=new Set(['checked_in','checked_out']);
+const BOOKING_LABEL={individual:'فردي',company:'شركة',group:'قروب/مجموعة'};
+const PAYER_LABEL={guest:'النزيل',company:'الشركة',group_master:'الحساب الرئيسي للقروب'};
+function V(){if(!state.v167||typeof state.v167!=='object')state.v167={};return state.v167;}
+function S(){if(!state.v166||typeof state.v166!=='object')state.v166={reservations:[],guestProfiles:[],companies:[],groups:[],roomAssignments:{},audit:[]};return state.v166;}
+function n(v){let x=Number(v||0);return Number.isFinite(x)?x:0;}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function iso(){return new Date().toISOString();}
+function today(){let d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`;}
+function localDateTime(){let d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),mi=String(d.getMinutes()).padStart(2,'0');return `${y}-${m}-${day}T${h}:${mi}`;}
+function money(v){return n(v).toLocaleString('ar-SA',{minimumFractionDigits:2,maximumFractionDigits:2})+' ريال';}
+function saveNow(){try{save()}catch(e){console.warn('v167 save',e)}}
+function repaint(){saveNow();try{render()}catch(e){console.error(e)}}
+function role(){try{return typeof currentRoleKey==='function'?currentRoleKey():(state.user?.roleKey||'viewer')}catch(e){return state.user?.roleKey||'viewer'}}
+function canReception(){return ['main_admin','admin_supervisor','admin_assistant','hotel_admin','hotel_manager','reception'].includes(role());}
+function canReservations(){return ['main_admin','admin_supervisor','admin_assistant','hotel_admin','hotel_manager','reservations_manager','reservations_agent','reception'].includes(role());}
+function currentHotelId(){try{return String(typeof currentHotel==='function'&&currentHotel()?currentHotel().id:state.currentHotelId||'')}catch(e){return String(state.currentHotelId||'')}}
+function hotels(){return (state.hotels||[]).filter(x=>x.active!==false);}
+function hotelName(id){return hotels().find(x=>String(x.id)===String(id))?.name||String(id||'-');}
+function resBy(id){return (S().reservations||[]).find(r=>r.id===id||r.confirmationNo===id)||null;}
+function guestBy(id){return (S().guestProfiles||[]).find(g=>g.id===id)||null;}
+function guestName(r){return guestBy(r?.guestProfileId)?.fullName||r?.guestName||'نزيل';}
+function companyBy(id){return (S().companies||[]).find(x=>x.id===id)||null;}
+function groupBy(id){return (S().groups||[]).find(x=>x.id===id)||null;}
+function unitTotal(u){return (u?.dailyRates||[]).reduce((s,d)=>s+n(d.amount)+n(d.tax)-n(d.discount),0);}
+function reservationTotal(r){let t=n(r?.finalTotal);if(t>0)return t;return (r?.units||[]).reduce((s,u)=>s+unitTotal(u),0);}
+function paidTotal(r){let ps=r?.payments||[];return ps.filter(p=>!['refunded','void'].includes(p.status)).reduce((s,p)=>s+n(p.amount),0)-ps.filter(p=>p.status==='refunded').reduce((s,p)=>s+n(p.amount),0);}
+function balance(r){return Math.max(0,reservationTotal(r)-paidTotal(r));}
+function paymentState(r){let p=paidTotal(r),b=balance(r);return b<=0.009?{key:'paid',label:'مدفوع بالكامل'}:p>0?{key:'partial',label:'مدفوع جزئي'}:{key:'unpaid',label:'غير مدفوع'};}
+function reservationQty(r){return (r?.units||[]).length||1;}
+function bookingType(r){if(r?.bookingType)return r.bookingType;if(r?.groupId)return 'group';if(r?.companyId)return 'company';return 'individual';}
+function payerType(r){if(r?.payerType)return r.payerType;let t=bookingType(r);return t==='company'?'company':t==='group'?'group_master':'guest';}
+function payerName(r){let p=payerType(r);if(p==='company')return companyBy(r.companyId)?.name||r.payerName||'الشركة';if(p==='group_master')return groupBy(r.groupId)?.name||r.payerName||'الحساب الرئيسي';return guestName(r);}
+function paymentMethod(r){let arr=(r?.payments||[]).filter(p=>!['refunded','void'].includes(p.status));if(!arr.length)return 'غير محدد';let uniq=[...new Set(arr.map(p=>p.method||'غير محدد'))];return uniq.length===1?uniq[0]:'متعدد';}
+function audit(r,action,data){let e={id:'audit-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),at:iso(),by:typeof displayUserName==='function'?displayUserName():'مستخدم',role:role(),entityType:'reservation',entityId:r.id,action,oldValues:null,newValues:data||null};r.audit=r.audit||[];r.audit.unshift(e);S().audit=Array.isArray(S().audit)?S().audit:[];S().audit.unshift(e);if(S().audit.length>2000)S().audit.length=2000;return e;}
+function ensure(){let v=V();v.version=VERSION;v.arrivalDate=v.arrivalDate||today();v.arrivalSearch=v.arrivalSearch||'';v.checkinMap=v.checkinMap||{};v.lastSync=v.lastSync||'';S().reservations=Array.isArray(S().reservations)?S().reservations:[];S().reservations.forEach(r=>{r.bookingType=bookingType(r);r.payerType=payerType(r);r.payerName=r.payerName||payerName(r);r.payments=Array.isArray(r.payments)?r.payments:[];r.audit=Array.isArray(r.audit)?r.audit:[];});backfillLinks();}
+function linkedCheckin(r){if(!r)return null;let id=r.checkinId||V().checkinMap[r.id];let c=id?(state.checkins||[]).find(x=>x.id===id):null;if(!c)c=(state.checkins||[]).find(x=>x.reservationId===r.id||x.confirmationNo===r.confirmationNo)||null;if(c){r.checkinId=c.id;V().checkinMap[r.id]=c.id;c.reservationId=r.id;c.confirmationNo=r.confirmationNo;}return c;}
+function backfillLinks(){(state.checkins||[]).forEach(c=>{if(c.reservationId){let r=resBy(c.reservationId);if(r){r.checkinId=c.id;V().checkinMap[r.id]=c.id;}}else if(c.confirmationNo){let r=resBy(c.confirmationNo);if(r){c.reservationId=r.id;r.checkinId=c.id;V().checkinMap[r.id]=c.id;}}});}
+function syncLinkedCheckin(r){let c=linkedCheckin(r);if(!c)return;let ps=paymentState(r),paid=paidTotal(r);if(!c.v167StayOwnsCharges)c.total=reservationTotal(r);c.paidAmount=paid;c.paymentStatus=ps.key==='paid'?'مدفوع':ps.key==='partial'?'جزئي':'غير مدفوع';c.paymentMethod=paymentMethod(r);c.bookingType=r.bookingType;c.payerType=r.payerType;c.payerName=payerName(r);c.companyName=companyBy(r.companyId)?.name||'';c.groupName=groupBy(r.groupId)?.name||'';c.v167PaymentSyncedAt=iso();}
+function syncReservationFromCheckin(c){if(!c?.reservationId)return;let r=resBy(c.reservationId);if(!r)return;r.finalTotal=n(c.total);r.updatedAt=iso();r.checkinId=c.id;r.stayTotalSource='reception';syncLinkedCheckin(r);}
+function dateOverlap(a1,a2,b1,b2){return String(a1)<String(b2)&&String(b1)<String(a2);}
+function hotelRooms(hid){let rows=state.hotelRooms?.[hid];if(Array.isArray(rows))return rows;
