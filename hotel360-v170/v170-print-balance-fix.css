@@ -1,0 +1,4 @@
+/* Hotel360 v170 */
+.v170-due{color:#b42318!important;font-weight:900!important;background:#fff1f1!important;border-radius:8px;padding:2px 6px;display:inline-block}
+.v170-paid{color:#117a48!important;font-weight:900!important;background:#edf9f1!important;border-radius:8px;padding:2px 6px;display:inline-block}
+@media print{#v170PrintFrame{display:none!important}}
