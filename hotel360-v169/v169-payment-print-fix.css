@@ -1,0 +1,6 @@
+/* Hotel360 v169 — payment status colors + clean arrivals printing */
+.v169-balance-due{display:inline-block;color:#b42318!important;background:#fff0f0;border:1px solid #f3c0c0;border-radius:10px;padding:4px 8px;font-weight:1000}
+.v169-balance-paid{display:inline-flex;align-items:center;gap:5px;color:#117a48!important;background:#eaf9ef;border:1px solid #bfe8cf;border-radius:10px;padding:4px 8px;font-weight:1000}
+.v169-print-btn{background:#172f28!important;color:#fff!important;border-color:#172f28!important}
+.v169-print-hint{display:inline-flex;align-items:center;padding:8px 10px;border-radius:11px;background:#eef8f4;border:1px solid #cfe7dc;color:#194f3b;font-size:12px;font-weight:800}
+@media(max-width:650px){.v169-print-hint{width:100%;justify-content:center}}
