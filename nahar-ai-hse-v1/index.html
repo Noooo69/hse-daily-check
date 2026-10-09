@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Nahar AI HSE v1</title>
+<style>
+:root{--bg:#0f1115;--panel:#171a21;--panel2:#1f2430;--text:#f6f7f9;--muted:#aab1bd;--accent:#d7a52c;--border:#303746;--danger:#ef4444;--warn:#f59e0b;--ok:#22c55e;--low:#60a5fa}
+*{box-sizing:border-box} body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(180deg,#0c0e12,#151923);color:var(--text)}
+button,input,textarea,select{font:inherit}.app{max-width:1400px;margin:auto;padding:18px}.top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}.brand{display:flex;align-items:center;gap:12px}.logo{width:50px;height:50px;border-radius:14px;background:var(--accent);display:grid;place-items:center;color:#101318;font-weight:900;font-size:20px}.title h1{margin:0;font-size:22px}.title p{margin:4px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--border);background:#232937;color:#fff;border-radius:10px;padding:10px 14px;cursor:pointer}.btn:hover{filter:brightness(1.08)}.btn.primary{background:var(--accent);color:#111;border:none;font-weight:800}.btn.danger{background:#3a1c20;border-color:#65252d}.grid{display:grid;grid-template-columns:340px 1fr;gap:16px}@media(max-width:950px){.grid{grid-template-columns:1fr}}.card{background:rgba(23,26,33,.95);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 12px 30px #0004}.card h3{margin:0 0 10px;font-size:16px}.field{margin-bottom:10px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;background:#11151d;color:#fff;border:1px solid var(--border);border-radius:9px;padding:10px}.field textarea{min-height:72px;resize:vertical}.drop{border:2px dashed #4a5365;border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer}.drop.drag{border-color:var(--accent);background:#d7a52c12}.thumbs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.thumb{position:relative;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#0d1117;aspect-ratio:4/3;cursor:pointer}.thumb img{width:100%;height:100%;object-fit:cover}.thumb.active{outline:2px solid var(--accent)}.thumb span{position:absolute;bottom:4px;right:4px;background:#000a;padding:3px 6px;border-radius:6px;font-size:11px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}.stat{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px}.stat .n{font-size:24px;font-weight:900}.stat .l{font-size:11px;color:var(--muted)}.work{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:12px}@media(max-width:1100px){.work{grid-template-columns:1fr}}.canvasWrap{position:relative;background:#0b0e13;border:1px solid var(--border);border-radius:12px;min-height:480px;display:grid;place-items:center;overflow:hidden}.canvasWrap img{max-width:100%;max-height:72vh;display:block;user-select:none}.box{position:absolute;border:3px solid var(--warn);border-radius:4px;cursor:move;min-width:40px;min-height:30px}.box.high{border-color:var(--danger)}.box.medium{border-color:var(--warn)}.box.low{border-color:var(--low)}.box .tag{position:absolute;top:-26px;right:-3px;background:#111827;border:1px solid currentColor;color:#fff;padding:3px 6px;border-radius:6px;font-size:11px;white-space:nowrap}.box .resize{position:absolute;width:14px;height:14px;left:-7px;bottom:-7px;background:#fff;border:2px solid #111;border-radius:50%;cursor:nwse-resize}.obsList{display:flex;flex-direction:column;gap:8px;max-height:64vh;overflow:auto}.obs{border:1px solid var(--border);border-radius:10px;padding:10px;background:#121721}.obsHead{display:flex;justify-content:space-between;gap:8px;align-items:center}.badge{font-size:11px;padding:4px 7px;border-radius:999px}.badge.high{background:#ef444422;color:#ff8585}.badge.medium{background:#f59e0b22;color:#ffc765}.badge.low{background:#60a5fa22;color:#93c5fd}.obs p{margin:7px 0;color:#d5d9e1;font-size:13px}.mini{display:flex;gap:6px;flex-wrap:wrap}.mini .btn{padding:6px 8px;font-size:11px}.empty{color:var(--muted);text-align:center;padding:28px 10px}.notice{font-size:12px;color:#cbd5e1;background:#10151d;border:1px solid var(--border);border-radius:10px;padding:10px;margin-top:10px}.footer{color:var(--muted);font-size:11px;text-align:center;margin:18px 0 6px}
+@media print{body{background:#fff;color:#000}.top,.sidebar,.screenOnly{display:none!important}.grid{display:block}.card{box-shadow:none;border:none;background:#fff;color:#000}.work{display:block}.canvasWrap{border:1px solid #aaa;background:#fff;min-height:0;margin-bottom:12px}.canvasWrap img{max-height:none}.obs{background:#fff;border:1px solid #bbb;color:#000}.obs p{color:#222}.box .tag{background:#fff;color:#000}.footer{color:#333}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><div class="logo">HSE</div><div class="title"><h1>Nahar AI HSE — v1</h1><p>فحص سلامة بالصور + مراجعة المفتش + تقرير PDF</p></div></div>
+    <div class="actions screenOnly">
+      <button class="btn" id="demoBtn">تحميل مثال تجريبي</button>
+      <button class="btn primary" id="scanAllBtn">افحص الكل</button>
+      <button class="btn" onclick="window.print()">طباعة / حفظ PDF</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <aside class="card sidebar">
+      <h3>بيانات الجولة</h3>
+      <div class="field"><label>اسم المنشأة / الموقع</label><input id="site" placeholder="مثال: فندق ديار الهدى"></div>
+      <div class="field"><label>اسم المفتش</label><input id="inspector" placeholder="اسم المفتش"></div>
+      <div class="field"><label>رقم التقرير</label><input id="reportNo" value="HSE-001"></div>
+      <div class="field"><label>تاريخ الجولة</label><input id="date" type="date"></div>
+      <div class="drop" id="drop">اضغط أو اسحب الصور هنا<br><small>يمكن رفع عدة صور</small><input id="file" type="file" accept="image/*" multiple hidden></div>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="notice">هذه النسخة تعمل بالكامل كواجهة فحص ومراجعة وتقرير. زر «الفحص» يشغّل محللًا تجريبيًا داخل المتصفح. ربط نموذج DINO/YOLO الحقيقي يكون في الـ Backend بالمرحلة التالية.</div>
+    </aside>
+
+    <main>
+      <div class="stats">
+        <div class="stat"><div class="n" id="score">100</div><div class="l">درجة السلامة</div></div>
+        <div class="stat"><div class="n" id="highN">0</div><div class="l">عالي</div></div>
+        <div class="stat"><div class="n" id="medN">0</div><div class="l">متوسط</div></div>
+        <div class="stat"><div class="n" id="lowN">0</div><div class="l">منخفض</div></div>
+      </div>
+
+      <div class="card">
+        <div class="work">
+          <div>
+            <div class="field screenOnly"><label>موقع الصورة</label><input id="imageLocation" placeholder="مثال: الدور الأرضي - الممر الشرقي"></div>
+            <div class="canvasWrap" id="canvasWrap"><div class="empty">ارفع صورة لبدء الجولة</div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+              <h3 style="margin:0">الملاحظات</h3>
+              <button class="btn screenOnly" id="addObsBtn">+ إضافة ملاحظة</button>
+            </div>
+            <div class="obsList" id="obsList"><div class="empty">لا توجد ملاحظات بعد</div></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="footer">أداة مساعدة للمفتش ولا تغني عن المعاينة الميدانية من مختص سلامة معتمد.</div>
+</div>
+<script>
+const state={images:[],active:-1};
+const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
+$('#date').value=new Date().toISOString().slice(0,10);
+function esc(s=''){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function addFiles(files){[...files].forEach(f=>{const r=new FileReader();r.onload=()=>{state.images.push({name:f.name,src:r.result,location:'',scanned:false,obs:[]});if(state.active<0)state.active=0;render()};r.readAsDataURL(f)})}
+$('#drop').onclick=()=>$('#file').click(); $('#file').onchange=e=>addFiles(e.target.files);
+['dragenter','dragover'].forEach(ev=>$('#drop').addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>$('#drop').addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.remove('drag')})); $('#drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+function render(){renderThumbs();renderActive();renderStats()}
+function renderThumbs(){const el=$('#thumbs');el.innerHTML='';state.images.forEach((im,i)=>{const d=document.createElement('div');d.className='thumb '+(i===state.active?'active':'');d.innerHTML=`<img src="${im.src}"><span>${i+1}${im.scanned?' ✓':''}</span>`;d.onclick=()=>{state.active=i;render()};el.appendChild(d)})}
+function renderActive(){const wrap=$('#canvasWrap'), list=$('#obsList'); if(state.active<0){wrap.innerHTML='<div class="empty">ارفع صورة لبدء الجولة</div>';list.innerHTML='<div class="empty">لا توجد ملاحظات بعد</div>';return} const im=state.images[state.active];$('#imageLocation').value=im.location||'';wrap.innerHTML=`<img id="mainImg" src="${im.src}">`;requestAnimationFrame(()=>renderBoxes()); renderObsList();}
+$('#imageLocation').oninput=e=>{if(state.active>=0)state.images[state.active].location=e.target.value};
+function renderBoxes(){const im=state.images[state.active],wrap=$('#canvasWrap'),img=$('#mainImg'); if(!img)return; const wr=wrap.getBoundingClientRect(),ir=img.getBoundingClientRect(); im.obs.forEach((o,idx)=>{const b=document.createElement('div');b.className='box '+o.severity;b.style.left=(ir.left-wr.left+o.box.x/100*ir.width)+'px';b.style.top=(ir.top-wr.top+o.box.y/100*ir.height)+'px';b.style.width=(o.box.w/100*ir.width)+'px';b.style.height=(o.box.h/100*ir.height)+'px';b.innerHTML=`<span class="tag">${idx+1} · ${esc(o.label)}</span><span class="resize"></span>`;enableDrag(b,o,img,wrap);wrap.appendChild(b)})}
+function enableDrag(el,o,img,wrap){let mode=null,sx=0,sy=0,start={};el.onpointerdown=e=>{mode=e.target.classList.contains('resize')?'resize':'move';sx=e.clientX;sy=e.clientY;start={...o.box};el.setPointerCapture(e.pointerId);e.preventDefault()};el.onpointermove=e=>{if(!mode)return;const r=img.getBoundingClientRect(),dx=(e.clientX-sx)/r.width*100,dy=(e.clientY-sy)/r.height*100;if(mode==='move'){o.box.x=Math.max(0,Math.min(100-o.box.w,start.x+dx));o.box.y=Math.max(0,Math.min(100-o.box.h,start.y+dy))}else{o.box.w=Math.max(3,Math.min(100-o.box.x,start.w-dx));o.box.h=Math.max(3,Math.min(100-o.box.y,start.h+dy))}renderActive()};el.onpointerup=()=>mode=null}
+function renderObsList(){const im=state.images[state.active],el=$('#obsList');if(!im.obs.length){el.innerHTML='<div class="empty">لا توجد ملاحظات بعد</div>';return}el.innerHTML='';im.obs.forEach((o,i)=>{const d=document.createElement('div');d.className='obs';d.innerHTML=`<div class="obsHead"><strong>${i+1}. ${esc(o.label)}</strong><span class="badge ${o.severity}">${sevAr(o.severity)}</span></div><p>${esc(o.description)}</p><p><b>التوصية:</b> ${esc(o.recommendation)}</p><div class="mini screenOnly"><button class="btn" data-edit>تعديل</button><button class="btn danger" data-del>حذف</button><select data-state class="btn"><option ${o.status==='مفتوحة'?'selected':''}>مفتوحة</option><option ${o.status==='قيد المعالجة'?'selected':''}>قيد المعالجة</option><option ${o.status==='تم التصحيح'?'selected':''}>تم التصحيح</option><option ${o.status==='مغلقة'?'selected':''}>مغلقة</option></select></div>`;d.querySelector('[data-del]').onclick=()=>{im.obs.splice(i,1);render()};d.querySelector('[data-edit]').onclick=()=>editObs(i);d.querySelector('[data-state]').onchange=e=>{o.status=e.target.value};el.appendChild(d)})}
+function sevAr(s){return s==='high'?'عالي':s==='medium'?'متوسط':'منخفض'}
+function newObs(){return{label:'ملاحظة سلامة',severity:'medium',description:'وصف الملاحظة',recommendation:'الإجراء التصحيحي المقترح',status:'مفتوحة',box:{x:30,y:30,w:25,h:20}}}
+$('#addObsBtn').onclick=()=>{if(state.active<0)return alert('ارفع صورة أولاً');state.images[state.active].obs.push(newObs());render()};
+function editObs(i){const o=state.images[state.active].obs[i];const label=prompt('عنوان الملاحظة',o.label);if(label===null)return;const severity=prompt('الخطورة: high / medium / low',o.severity)||o.severity;const description=prompt('الوصف',o.description)||o.description;const recommendation=prompt('التوصية',o.recommendation)||o.recommendation;Object.assign(o,{label,severity:['high','medium','low'].includes(severity)?severity:o.severity,description,recommendation});render()}
+function scanImage(im){im.scanned=true;if(im.obs.length)return; const presets=[
+{label:'طفاية حريق تحتاج فحص',severity:'medium',description:'يجب التحقق من سلامة الطفاية، بطاقة الفحص، مؤشر الضغط، الخرطوم، وعدم وجود عوائق.',recommendation:'إجراء فحص ميداني واعتماد الحالة وتوثيق أي نقص أو تلف.',box:{x:12,y:18,w:25,h:58}},
+{label:'تمديد كهربائي / أسلاك',severity:'high',description:'يجب التحقق من وجود أسلاك مكشوفة أو تمديدات غير منظمة أو توصيلات مؤقتة.',recommendation:'عزل مصدر الخطر وتنظيم التمديدات بواسطة فني مؤهل وفق إجراءات السلامة.',box:{x:55,y:42,w:30,h:24}},
+{label:'مسار إخلاء / عائق محتمل',severity:'low',description:'يلزم التأكد من خلو مسار الحركة ومخرج الطوارئ من العوائق.',recommendation:'إزالة أي عائق والحفاظ على مسار الإخلاء واضحًا ومتاحًا.',box:{x:40,y:68,w:35,h:20}}]; im.obs=presets.map(x=>({...x,status:'مفتوحة'}));}
+$('#scanAllBtn').onclick=()=>{if(!state.images.length)return alert('ارفع صور أولاً');state.images.forEach(scanImage);render()};
+function renderStats(){let h=0,m=0,l=0;state.images.forEach(im=>im.obs.forEach(o=>o.severity==='high'?h++:o.severity==='medium'?m++:l++));$('#highN').textContent=h;$('#medN').textContent=m;$('#lowN').textContent=l;$('#score').textContent=Math.max(0,100-h*25-m*12-l*4)}
+$('#demoBtn').onclick=()=>{const c=document.createElement('canvas');c.width=1000;c.height=650;const x=c.getContext('2d');x.fillStyle='#dad7cf';x.fillRect(0,0,c.width,c.height);x.fillStyle='#777';x.fillRect(730,70,120,420);x.fillStyle='#c62828';x.fillRect(120,180,180,340);x.fillStyle='#222';x.fillRect(170,240,80,55);x.fillStyle='#444';x.fillRect(530,360,260,40);x.font='32px Arial';x.fillStyle='#111';x.fillText('HSE DEMO AREA',350,80);state.images=[{name:'demo.jpg',src:c.toDataURL('image/jpeg',.9),location:'منطقة تجريبية',scanned:false,obs:[]}];state.active=0;render()}
+window.addEventListener('resize',()=>{if(state.active>=0)renderActive()});
+render();
+</script>
+</body></html>
