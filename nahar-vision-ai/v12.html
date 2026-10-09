@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nahar Vision AI</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#07100e;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block}
+</style>
+</head>
+<body>
+<iframe id="app" src="./index.html?v=11" allow="geolocation"></iframe>
+<script>
+const app=document.getElementById('app');
+app.addEventListener('load',()=>{
+  const w=app.contentWindow,d=app.contentDocument;
+  if(!d||!d.querySelector('.uploader'))return;
+
+  const style=d.createElement('style');
+  style.textContent=`.locationpanel{margin-top:12px;padding:14px;border:1px solid #2d4b42;border-radius:15px;background:#091713}.locationpanel h3{margin:0 0 9px;font-size:14px}.locgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.locgrid input{width:100%;border:1px solid #294239;border-radius:11px;padding:11px;background:#06100d;color:white;font:inherit}.locactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.locactions button{border:0;border-radius:11px;padding:10px 13px;font-weight:700;cursor:pointer}.locstatus{font-size:11px;color:#9cb0aa;margin-top:8px;line-height:1.6}.locstatus a{color:#9ce5c8}@media(max-width:760px){.locgrid{grid-template-columns:1fr}}`;
+  d.head.appendChild(style);
+
+  const drop=d.getElementById('dropzone');
+  const panel=d.createElement('div');
+  panel.className='locationpanel';
+  panel.innerHTML=`<h3>موقع الجولة / المستودع</h3><div class="locgrid"><input id="siteNameV12" type="text" placeholder="اسم الموقع أو المستودع — مثال: مستودع B1"><input id="siteDetailV12" type="text" placeholder="تفاصيل المكان — مثال: الدور الأرضي / غرفة الكهرباء"></div><div class="locactions"><button id="gpsBtnV12" class="primary" type="button">استخدام موقعي الحالي</button><button id="clearLocBtnV12" class="ghost" type="button">مسح الموقع</button></div><div id="locStatusV12" class="locstatus">اكتب اسم الموقع يدويًا، أو استخدم GPS لإضافة الإحداثيات إلى تقرير المدير.</div>`;
+  drop.insertAdjacentElement('afterend',panel);
+
+  const siteName=d.getElementById('siteNameV12'),siteDetail=d.getElementById('siteDetailV12'),gpsBtn=d.getElementById('gpsBtnV12'),clearBtn=d.getElementById('clearLocBtnV12'),status=d.getElementById('locStatusV12');
+  let gps=null;
+  try{siteName.value=localStorage.getItem('nahar_site_name')||'';siteDetail.value=localStorage.getItem('nahar_site_detail')||'';const raw=localStorage.getItem('nahar_gps');if(raw)gps=JSON.parse(raw)}catch{}
+  function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]))}
+  function save(){try{localStorage.setItem('nahar_site_name',siteName.value.trim());localStorage.setItem('nahar_site_detail',siteDetail.value.trim());if(gps)localStorage.setItem('nahar_gps',JSON.stringify(gps));else localStorage.removeItem('nahar_gps')}catch{}}
+  function render(){if(gps){const lat=Number(gps.lat).toFixed(6),lng=Number(gps.lng).toFixed(6);status.innerHTML=`تم حفظ الإحداثيات: <b dir="ltr">${lat}, ${lng}</b> — <a target="_blank" rel="noopener" href="https://maps.google.com/?q=${encodeURIComponent(lat+','+lng)}">فتح في الخرائط</a>`}else status.textContent='اكتب اسم الموقع يدويًا، أو استخدم GPS لإضافة الإحداثيات إلى تقرير المدير.'}
+  siteName.addEventListener('input',save);siteDetail.addEventListener('input',save);render();
+  gpsBtn.onclick=()=>{if(!navigator.geolocation){status.textContent='المتصفح لا يدعم تحديد الموقع.';return}gpsBtn.disabled=true;status.textContent='جارٍ تحديد موقعك… اسمح للمتصفح بالوصول للموقع.';navigator.geolocation.getCurrentPosition(pos=>{gps={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:Math.round(pos.coords.accuracy||0)};save();render();gpsBtn.disabled=false},err=>{gpsBtn.disabled=false;status.textContent=err.code===1?'لم يتم السماح بالموقع. اكتب اسم الموقع يدويًا أو فعّل صلاحية الموقع.':'تعذر تحديد الموقع الآن. جرّب مرة أخرى.'},{enableHighAccuracy:true,timeout:12000,maximumAge:60000})};
+  clearBtn.onclick=()=>{siteName.value='';siteDetail.value='';gps=null;save();render()};
+
+  const reportBtn=d.getElementById('reportBtn');
+  const oldBuild=w.buildManagerReport;
+  if(reportBtn&&typeof oldBuild==='function'){
+    reportBtn.onclick=()=>{
+      let popup=null;
+      const oldOpen=w.open;
+      w.open=function(...args){popup=oldOpen.apply(w,args);return popup};
+      try{oldBuild.call(w)}finally{w.open=oldOpen}
+      setTimeout(()=>{
+        try{
+          if(!popup||popup.closed)return;
+          const pd=popup.document,head=pd.querySelector('.head');if(!head)return;
+          const name=siteName.value.trim(),detail=siteDetail.value.trim();
+          let gpsText='',gpsLink='';if(gps){gpsText=`${Number(gps.lat).toFixed(6)}, ${Number(gps.lng).toFixed(6)}`;gpsLink=`https://maps.google.com/?q=${encodeURIComponent(gpsText)}`}
+          const box=pd.createElement('div');box.style.cssText='margin-top:12px;background:rgba(255,255,255,.1);padding:10px 12px;border-radius:10px;line-height:1.8;font-size:12px';
+          box.innerHTML=`<b>موقع الجولة:</b> ${esc(name||'غير مسمى')}${detail?`<br><b>التفاصيل:</b> ${esc(detail)}`:''}${gpsText?`<br><b>الإحداثيات:</b> <span dir="ltr">${esc(gpsText)}</span> — <a style="color:#bfffe5" href="${gpsLink}" target="_blank">فتح في الخرائط</a>`:''}`;
+          const stats=head.querySelector('.stats');head.insertBefore(box,stats||null);
+        }catch(e){console.error(e)}
+      },150);
+    };
+  }
+});
+</script>
+</body>
+</html>
