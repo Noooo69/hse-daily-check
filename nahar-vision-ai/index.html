@@ -6,154 +6,59 @@
 <meta name="theme-color" content="#07100e" />
 <title>Nahar Vision AI — تحليل السلامة بالذكاء الاصطناعي</title>
 <style>
-:root{--bg:#07100e;--panel:#0d1a17;--panel2:#10221e;--text:#f5f8f7;--muted:#9cb0aa;--line:#21352f;--accent:#55d6a5;--accent2:#1e8e69;--danger:#ff4d4f;--warn:#ffb020;--low:#6ea8ff}
-*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:radial-gradient(circle at 85% -10%,#143d31 0,transparent 38%),var(--bg);color:var(--text);min-height:100vh}
-button,input{font:inherit}.topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:15px max(18px,calc((100vw - 1160px)/2));background:rgba(7,16,14,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,var(--accent),#247e61);color:#04100c;font-weight:900;box-shadow:0 8px 30px rgba(85,214,165,.2)}h1{font-size:18px;margin:0}.brand p{font-size:12px;margin:3px 0 0;color:var(--muted)}
-.mode{font-size:12px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}.mode.ai{color:#bfffe5;border-color:#257d60;background:#0b2b21}.mode.demo{color:#ffe1a8;border-color:#7a5a23;background:#2b210d}
-.wrap{width:min(1160px,calc(100% - 28px));margin:26px auto 70px}.card{background:linear-gradient(180deg,rgba(17,36,31,.97),rgba(12,27,23,.97));border:1px solid var(--line);border-radius:22px;box-shadow:0 14px 50px rgba(0,0,0,.18)}
-.hero{padding:28px;display:grid;grid-template-columns:1.4fr .8fr;gap:24px;align-items:center}.eyebrow{font-size:12px;color:var(--accent);font-weight:700}.hero h2{font-size:clamp(25px,4vw,44px);line-height:1.15;margin:10px 0 12px;max-width:760px}.hero p{margin:0;color:var(--muted);line-height:1.8;max-width:760px}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mini-grid div{background:#0a1613;border:1px solid var(--line);border-radius:16px;padding:18px 10px;text-align:center}.mini-grid b{display:block;font-size:28px}.mini-grid span{font-size:11px;color:var(--muted)}
-.uploader{padding:20px;margin-top:18px}.dropzone{border:1.5px dashed #335249;border-radius:18px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:.2s;background:rgba(4,13,10,.32)}.dropzone:hover,.dropzone.drag{border-color:var(--accent);background:rgba(85,214,165,.05)}.upload-icon{width:52px;height:52px;border-radius:17px;background:#123129;display:grid;place-items:center;color:var(--accent);font-size:29px}.dropzone h3{margin:13px 0 6px}.dropzone p{margin:0;color:var(--muted);font-size:13px}.actions{display:flex;gap:10px;margin-top:14px}.actions button{border:0;border-radius:13px;padding:12px 18px;font-weight:750;cursor:pointer}.actions button:disabled{opacity:.35;cursor:not-allowed}.primary{background:var(--accent);color:#052017}.ghost{background:#162722;color:#d6e4df;border:1px solid var(--line)!important}.notice{margin-top:12px;color:#b1c2bd;font-size:12px;line-height:1.7}
-.progress-card{margin-top:18px;padding:16px 20px}.progress-head{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}.progress{height:8px;background:#07110e;border-radius:99px;margin-top:10px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:var(--accent);transition:.25s}.hidden{display:none!important}
-.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.image-card{overflow:hidden}.image-stage{position:relative;aspect-ratio:4/3;background:#050907;overflow:hidden}.photo{width:100%;height:100%;object-fit:contain;display:block}.boxes{position:absolute;inset:0;pointer-events:none}.bbox{position:absolute;border:3px solid var(--danger);border-radius:7px;box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 20px rgba(255,77,79,.16)}.bbox span{position:absolute;right:-3px;top:-29px;background:var(--danger);color:white;font-size:11px;font-weight:800;padding:5px 8px;border-radius:7px 7px 0 0;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}.status-chip{position:absolute;top:12px;left:12px;background:rgba(4,10,8,.82);backdrop-filter:blur(8px);border:1px solid #294039;border-radius:999px;padding:7px 10px;font-size:11px}.status-chip.ok{color:#b9ffdd;border-color:#2e765d}.status-chip.bad{color:#ffd0d0;border-color:#7b3838}.status-chip.demo{color:#ffe1a8;border-color:#7a5a23}.image-info{padding:17px}.title-row{display:flex;gap:10px;justify-content:space-between;align-items:center}.filename{font-size:14px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.finding-count{font-size:11px;color:var(--muted);white-space:nowrap}.summary{font-size:12px;line-height:1.7;margin-top:8px}.muted{color:var(--muted)}.findings{display:grid;gap:10px;margin-top:13px}.finding{border:1px solid var(--line);border-radius:14px;padding:12px;background:#0a1713}.finding-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.finding h4{font-size:13px;margin:0}.sev{font-size:10px;border-radius:999px;padding:5px 7px;font-weight:800}.sev.حرجة,.sev.عالية{background:#3b1516;color:#ffbcbc}.sev.متوسطة{background:#3a2b0f;color:#ffd98a}.sev.منخفضة{background:#102a40;color:#b9dcff}.meta{font-size:10px;color:#7f9890;margin-top:4px}.finding p{font-size:12px;line-height:1.65;margin:8px 0;color:#cbd8d4}.action-line{font-size:11px;color:#aee8d1;border-top:1px dashed #284139;padding-top:8px}.error-text{color:#ffc0c0}
-@media(max-width:760px){.topbar{padding:12px 14px}.brand p{display:none}.hero{grid-template-columns:1fr;padding:20px}.mini-grid{grid-template-columns:repeat(3,1fr)}.gallery{grid-template-columns:1fr}.wrap{width:min(100% - 18px,1160px);margin-top:14px}.uploader{padding:12px}.dropzone{min-height:165px}.actions{display:grid;grid-template-columns:1fr 1fr}.hero h2{font-size:29px}}
+:root{--bg:#07100e;--panel:#0d1a17;--text:#f5f8f7;--muted:#9cb0aa;--line:#21352f;--accent:#55d6a5;--danger:#ff5b5d}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:radial-gradient(circle at 85% -10%,#143d31 0,transparent 38%),var(--bg);color:var(--text);min-height:100vh}button,input{font:inherit}
+.topbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px max(16px,calc((100vw - 1160px)/2));background:rgba(7,16,14,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.brand{display:flex;gap:11px;align-items:center}.logo{width:45px;height:45px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,var(--accent),#247e61);color:#04100c;font-weight:900}.brand h1{font-size:18px;margin:0}.brand p{font-size:11px;color:var(--muted);margin:3px 0 0}.mode{font-size:11px;padding:8px 10px;border:1px solid #267e61;border-radius:999px;color:#bfffe5;background:#0b2b21}
+.wrap{width:min(1160px,calc(100% - 24px));margin:22px auto 70px}.card{background:linear-gradient(180deg,rgba(17,36,31,.97),rgba(12,27,23,.97));border:1px solid var(--line);border-radius:22px;box-shadow:0 14px 50px rgba(0,0,0,.18)}
+.hero{padding:26px;display:grid;grid-template-columns:1.35fr .75fr;gap:20px;align-items:center}.eyebrow{font-size:12px;color:var(--accent);font-weight:700}.hero h2{font-size:clamp(25px,4vw,42px);line-height:1.15;margin:10px 0 12px}.hero p{margin:0;color:var(--muted);line-height:1.75}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.mini-grid div{background:#0a1613;border:1px solid var(--line);border-radius:15px;padding:16px 8px;text-align:center}.mini-grid b{display:block;font-size:27px}.mini-grid span{font-size:10px;color:var(--muted)}
+.uploader{padding:18px;margin-top:16px}.dropzone{border:1.5px dashed #335249;border-radius:18px;min-height:175px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;background:rgba(4,13,10,.32)}.upload-icon{width:50px;height:50px;border-radius:16px;background:#123129;display:grid;place-items:center;color:var(--accent);font-size:28px}.dropzone h3{margin:12px 0 5px}.dropzone p{margin:0;color:var(--muted);font-size:12px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.actions button{border:0;border-radius:12px;padding:11px 16px;font-weight:750;cursor:pointer}.actions button:disabled{opacity:.35;cursor:not-allowed}.primary{background:var(--accent);color:#052017}.ghost{background:#162722;color:#d6e4df;border:1px solid var(--line)!important}.notice{margin-top:11px;color:#b1c2bd;font-size:11px;line-height:1.7}.error-text{color:#ffc0c0}
+.keypanel{margin-top:12px;padding:14px;border:1px solid #2d4b42;border-radius:15px;background:#091713}.keypanel h3{margin:0 0 8px;font-size:14px}.keyrow{display:grid;grid-template-columns:1fr auto auto;gap:8px}.keyrow input{width:100%;border:1px solid #294239;border-radius:11px;padding:11px;background:#06100d;color:white;direction:ltr}.keyrow button{border:0;border-radius:11px;padding:10px 13px;font-weight:700;cursor:pointer}.remember{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;margin-top:8px}.hidden{display:none!important}
+.progress-card{margin-top:16px;padding:15px 18px}.progress-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}.progress{height:8px;background:#07110e;border-radius:99px;margin-top:9px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:var(--accent);transition:.25s}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}.image-card{overflow:hidden}.image-stage{position:relative;aspect-ratio:4/3;background:#050907;overflow:hidden}.photo{width:100%;height:100%;object-fit:contain;display:block}.boxes{position:absolute;inset:0;pointer-events:none}.bbox{position:absolute;border:3px solid var(--danger);border-radius:7px;box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 20px rgba(255,77,79,.18)}.bbox span{position:absolute;right:-3px;top:-28px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;padding:5px 7px;border-radius:7px 7px 0 0;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}.status-chip{position:absolute;top:11px;left:11px;background:rgba(4,10,8,.84);border:1px solid #294039;border-radius:999px;padding:6px 9px;font-size:10px}.status-chip.ok{color:#b9ffdd;border-color:#2e765d}.status-chip.bad{color:#ffd0d0;border-color:#7b3838}.image-info{padding:15px}.title-row{display:flex;gap:8px;justify-content:space-between;align-items:center}.filename{font-size:13px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.finding-count{font-size:10px;color:var(--muted);white-space:nowrap}.summary{font-size:11px;line-height:1.7;margin-top:7px}.muted{color:var(--muted)}.findings{display:grid;gap:9px;margin-top:11px}.finding{border:1px solid var(--line);border-radius:13px;padding:11px;background:#0a1713}.finding-head{display:flex;justify-content:space-between;gap:7px}.finding h4{font-size:12px;margin:0}.sev{font-size:9px;border-radius:999px;padding:4px 6px}.sev.حرجة,.sev.عالية{background:#3b1516;color:#ffbcbc}.sev.متوسطة{background:#3a2b0f;color:#ffd98a}.sev.منخفضة{background:#102a40;color:#b9dcff}.meta{font-size:9px;color:#7f9890;margin-top:3px}.finding p{font-size:11px;line-height:1.6;margin:7px 0;color:#cbd8d4}.action-line{font-size:10px;color:#aee8d1;border-top:1px dashed #284139;padding-top:7px}
+@media(max-width:760px){.topbar{padding:11px 12px}.brand p{display:none}.hero{grid-template-columns:1fr;padding:18px}.gallery{grid-template-columns:1fr}.wrap{width:calc(100% - 16px);margin-top:12px}.uploader{padding:11px}.dropzone{min-height:155px}.actions{display:grid;grid-template-columns:1fr 1fr}.keyrow{grid-template-columns:1fr 1fr}.keyrow input{grid-column:1/-1}.hero h2{font-size:28px}}
 </style>
 </head>
 <body>
-<header class="topbar">
-<div class="brand">
-<div class="logo">NV</div>
-<div><h1>Nahar Vision AI</h1><p>مساعد الفحص البصري للسلامة — Beta</p></div>
-</div>
-<div id="modeBadge" class="mode ai">AI حقيقي · Beta</div>
-</header>
+<header class="topbar"><div class="brand"><div class="logo">NV</div><div><h1>Nahar Vision AI</h1><p>مساعد الفحص البصري للسلامة — Beta</p></div></div><div class="mode">Gemini مجاني · مباشر</div></header>
 <main class="wrap">
-<section class="hero card">
-<div>
-<span class="eyebrow">مشروع نهار الحربي</span>
-<h2>ارفع الصورة، ودع النظام يحدد الملاحظة ومكانها.</h2>
-<p>يحلل الذكاء الاصطناعي الصورة، ثم يعرض نوع الملاحظة ومستوى الخطورة والثقة البصرية والإجراء المقترح، مع مربع أحمر على موضعها.</p>
-</div>
-<div class="mini-grid">
-<div><b id="countImages">0</b><span>صور</span></div>
-<div><b id="countFindings">0</b><span>ملاحظات</span></div>
-<div><b id="countHigh">0</b><span>عالية/حرجة</span></div>
-</div>
-</section>
+<section class="hero card"><div><span class="eyebrow">مشروع نهار الحربي</span><h2>ارفع الصورة، ودع النظام يحدد الملاحظة ومكانها.</h2><p>التحليل يتم مباشرة من جهازك إلى Gemini بدون المرور على خادم Supabase، لتقليل الانتظار.</p></div><div class="mini-grid"><div><b id="countImages">0</b><span>صور</span></div><div><b id="countFindings">0</b><span>ملاحظات</span></div><div><b id="countHigh">0</b><span>عالية/حرجة</span></div></div></section>
 <section class="card uploader">
-<label id="dropzone" class="dropzone">
-<input id="fileInput" type="file" accept="image/*" multiple hidden />
-<div class="upload-icon">＋</div>
-<h3>اختر الصور أو اسحبها هنا</h3>
-<p>حتى 50 صورة — يتم ضغط الصورة محليًا قبل إرسالها للتحليل</p>
-</label>
-<div class="actions">
-<button id="analyzeBtn" class="primary" disabled>تحليل الصور بالذكاء الاصطناعي</button>
-<button id="clearBtn" class="ghost" disabled>مسح الكل</button>
-</div>
-<div class="notice" id="notice">التحليل بصري مساعد وليس ضمانًا لعدم وجود مخاطر. القرار النهائي في مسائل السلامة يحتاج تحققًا ميدانيًا من مختص.</div>
+<label id="dropzone" class="dropzone"><input id="fileInput" type="file" accept="image/*" multiple hidden><div class="upload-icon">＋</div><h3>اختر الصور أو اسحبها هنا</h3><p>حتى 50 صورة — يتم تصغيرها محليًا قبل التحليل</p></label>
+<div class="actions"><button id="analyzeBtn" class="primary" disabled>تحليل الصور بالذكاء الاصطناعي</button><button id="clearBtn" class="ghost" disabled>مسح الكل</button><button id="keyBtn" class="ghost">إعداد مفتاح Gemini</button></div>
+<div id="keyPanel" class="keypanel hidden"><h3>مفتاح Gemini</h3><div class="keyrow"><input id="keyInput" type="password" autocomplete="off" placeholder="الصق مفتاح Gemini هنا"><button id="saveKeyBtn" class="primary">حفظ</button><button id="removeKeyBtn" class="ghost">مسح المفتاح</button></div><label class="remember"><input id="rememberKey" type="checkbox"> حفظ المفتاح على هذا الجهاز. إذا لم تحددها يُحفظ فقط حتى إغلاق التبويب.</label></div>
+<div class="notice" id="notice">التحليل بصري مساعد وليس ضمانًا لعدم وجود مخاطر. في الفئة المجانية تُرسل الصور إلى Google Gemini وقد تخضع لسياسة استخدام بيانات الفئة المجانية.</div>
 </section>
-<section id="progressWrap" class="card progress-card hidden">
-<div class="progress-head"><span id="progressText">جارٍ التحليل…</span><b id="progressPct">0%</b></div>
-<div class="progress"><i id="progressBar"></i></div>
-</section>
+<section id="progressWrap" class="card progress-card hidden"><div class="progress-head"><span id="progressText">جارٍ التحليل…</span><b id="progressPct">0%</b></div><div class="progress"><i id="progressBar"></i></div></section>
 <section id="gallery" class="gallery"></section>
 </main>
-<template id="imageCardTemplate">
-<article class="image-card card">
-<div class="image-stage">
-<img class="photo" alt="صورة الفحص" />
-<div class="boxes"></div>
-<span class="status-chip">بانتظار التحليل</span>
-</div>
-<div class="image-info">
-<div class="title-row"><h3 class="filename"></h3><span class="finding-count">—</span></div>
-<div class="summary muted">لم يتم التحليل بعد.</div>
-<div class="findings"></div>
-</div>
-</article>
-</template>
+<template id="imageCardTemplate"><article class="image-card card"><div class="image-stage"><img class="photo" alt="صورة الفحص"><div class="boxes"></div><span class="status-chip">بانتظار التحليل</span></div><div class="image-info"><div class="title-row"><h3 class="filename"></h3><span class="finding-count">—</span></div><div class="summary muted">لم يتم التحليل بعد.</div><div class="findings"></div></div></article></template>
 <script>
-const ENDPOINT='https://idcjswkmklotnjtqhubp.supabase.co/functions/v1/analyze-safety-image';
-const SUPABASE_PUBLISHABLE='sb_publishable_m2MQqgETi3ED-44Uz_40SQ_o7WJdP0R';
-const fileInput=document.getElementById('fileInput'),dropzone=document.getElementById('dropzone'),analyzeBtn=document.getElementById('analyzeBtn'),clearBtn=document.getElementById('clearBtn'),gallery=document.getElementById('gallery'),template=document.getElementById('imageCardTemplate'),notice=document.getElementById('notice'),progressWrap=document.getElementById('progressWrap'),progressBar=document.getElementById('progressBar'),progressText=document.getElementById('progressText'),progressPct=document.getElementById('progressPct'),countImages=document.getElementById('countImages'),countFindings=document.getElementById('countFindings'),countHigh=document.getElementById('countHigh');
+const MODEL='gemini-3.5-flash-lite';
+const fileInput=document.getElementById('fileInput'),dropzone=document.getElementById('dropzone'),analyzeBtn=document.getElementById('analyzeBtn'),clearBtn=document.getElementById('clearBtn'),keyBtn=document.getElementById('keyBtn'),keyPanel=document.getElementById('keyPanel'),keyInput=document.getElementById('keyInput'),saveKeyBtn=document.getElementById('saveKeyBtn'),removeKeyBtn=document.getElementById('removeKeyBtn'),rememberKey=document.getElementById('rememberKey'),gallery=document.getElementById('gallery'),template=document.getElementById('imageCardTemplate'),notice=document.getElementById('notice'),progressWrap=document.getElementById('progressWrap'),progressBar=document.getElementById('progressBar'),progressText=document.getElementById('progressText'),progressPct=document.getElementById('progressPct'),countImages=document.getElementById('countImages'),countFindings=document.getElementById('countFindings'),countHigh=document.getElementById('countHigh');
 let items=[];
+const schema={type:'object',properties:{summary:{type:'string'},findings:{type:'array',maxItems:6,items:{type:'object',properties:{label:{type:'string'},category:{type:'string'},severity:{type:'string',enum:['منخفضة','متوسطة','عالية','حرجة']},confidence:{type:'number',minimum:0,maximum:100},observation:{type:'string'},action:{type:'string'},box:{type:'object',properties:{x:{type:'number',minimum:0,maximum:1000},y:{type:'number',minimum:0,maximum:1000},w:{type:'number',minimum:1,maximum:1000},h:{type:'number',minimum:1,maximum:1000}},required:['x','y','w','h'],additionalProperties:false}},required:['label','category','severity','confidence','observation','action','box'],additionalProperties:false}}},required:['summary','findings'],additionalProperties:false};
 function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]))}
 function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
 function size(n){return n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,n/1024).toFixed(0)+' KB'}
+function getKey(){return sessionStorage.getItem('nahar_gemini_key')||localStorage.getItem('nahar_gemini_key')||''}
+function setKey(v,remember){sessionStorage.removeItem('nahar_gemini_key');localStorage.removeItem('nahar_gemini_key');(remember?localStorage:sessionStorage).setItem('nahar_gemini_key',v)}
+keyBtn.onclick=()=>{keyPanel.classList.toggle('hidden');if(!keyPanel.classList.contains('hidden'))keyInput.focus()};
+saveKeyBtn.onclick=()=>{const v=keyInput.value.trim();if(v.length<20){notice.textContent='المفتاح يبدو غير صحيح.';notice.classList.add('error-text');return}setKey(v,rememberKey.checked);keyInput.value='';keyPanel.classList.add('hidden');notice.classList.remove('error-text');notice.textContent='تم حفظ مفتاح Gemini على هذا الجهاز فقط. ارفع صورة ثم ابدأ التحليل.'};
+removeKeyBtn.onclick=()=>{sessionStorage.removeItem('nahar_gemini_key');localStorage.removeItem('nahar_gemini_key');keyInput.value='';notice.textContent='تم مسح المفتاح من هذا الجهاز.'};
 function readFile(f){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('تعذر قراءة الصورة'));r.readAsDataURL(f)})}
-function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('صيغة الصورة غير مدعومة في هذا المتصفح'));im.src=src})}
-async function prepareForAI(file){
-const src=await readFile(file),img=await loadImage(src);
-const maxSide=1800,scale=Math.min(1,maxSide/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
-const w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale)),h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
-const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{alpha:false});
-ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
-return {preview:src,ai:canvas.toDataURL('image/jpeg',.84),naturalWidth:img.naturalWidth||img.width,naturalHeight:img.naturalHeight||img.height};
-}
-async function addFiles(fs){
-const incoming=[...fs].filter(f=>f.type.startsWith('image/')||/\.(heic|heif|jpg|jpeg|png|webp)$/i.test(f.name)).slice(0,50-items.length);
-for(const f of incoming){
-try{
-const prepared=await prepareForAI(f),i={id:uid(),file:f,dataUrl:prepared.preview,aiDataUrl:prepared.ai,result:null,error:null};items.push(i);
-const n=template.content.firstElementChild.cloneNode(true);n.dataset.id=i.id;n.querySelector('.photo').src=i.dataUrl;n.querySelector('.filename').textContent=f.name;n.querySelector('.summary').textContent=size(f.size)+' — جاهزة للتحليل.';gallery.appendChild(n);
-}catch(err){
-notice.textContent=`تعذر تجهيز ${f.name}: ${err.message}`;notice.classList.add('error-text');
-}
-}
-fileInput.value='';upd();
-}
-function upd(){
-analyzeBtn.disabled=!items.length||items.every(i=>i.result||i.error);clearBtn.disabled=!items.length;countImages.textContent=items.length;
-const f=items.flatMap(i=>i.result?.findings||[]);countFindings.textContent=f.length;countHigh.textContent=f.filter(x=>['عالية','حرجة'].includes(x.severity)).length;
-}
-fileInput.onchange=e=>addFiles(e.target.files);
-['dragenter','dragover'].forEach(x=>dropzone.addEventListener(x,e=>{e.preventDefault();dropzone.classList.add('drag')}));
-['dragleave','drop'].forEach(x=>dropzone.addEventListener(x,e=>{e.preventDefault();dropzone.classList.remove('drag')}));
-dropzone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
-clearBtn.onclick=()=>{items=[];gallery.innerHTML='';fileInput.value='';notice.classList.remove('error-text');notice.textContent='التحليل بصري مساعد وليس ضمانًا لعدم وجود مخاطر. القرار النهائي في مسائل السلامة يحتاج تحققًا ميدانيًا من مختص.';upd()};
-function imageRect(stage,img){
-const sw=stage.clientWidth,sh=stage.clientHeight,nw=img.naturalWidth||1,nh=img.naturalHeight||1,scale=Math.min(sw/nw,sh/nh),dw=nw*scale,dh=nh*scale;
-return {left:(sw-dw)/2,top:(sh-dh)/2,width:dw,height:dh};
-}
-function placeBox(el,b,stage,img){
-const r=imageRect(stage,img),x=Math.max(0,Math.min(1000,+b.x||0)),y=Math.max(0,Math.min(1000,+b.y||0)),w=Math.max(1,Math.min(1000,+b.w||1)),h=Math.max(1,Math.min(1000,+b.h||1));
-el.style.left=(r.left+r.width*x/1000)+'px';el.style.top=(r.top+r.height*y/1000)+'px';el.style.width=(r.width*w/1000)+'px';el.style.height=(r.height*h/1000)+'px';
-}
-function paint(i){
-const c=gallery.querySelector(`[data-id="${i.id}"]`),r=i.result,bx=c.querySelector('.boxes'),li=c.querySelector('.findings'),chip=c.querySelector('.status-chip'),stage=c.querySelector('.image-stage'),img=c.querySelector('.photo');bx.innerHTML='';li.innerHTML='';
-c.querySelector('.finding-count').textContent=r.findings.length+' ملاحظة';c.querySelector('.summary').textContent=r.summary;
-chip.textContent=r.findings.length?'تم التحليل بالذكاء الاصطناعي':'لا توجد ملاحظة واضحة';chip.className='status-chip ok';
-r.findings.forEach((f,k)=>{
-const e=document.createElement('div');e.className='bbox';e.innerHTML=`<span>${k+1}. ${esc(f.label)}</span>`;bx.appendChild(e);placeBox(e,f.box||{},stage,img);
-const d=document.createElement('div');d.className='finding';d.innerHTML=`<div class="finding-head"><div><h4>${k+1}. ${esc(f.label)}</h4><div class="meta">${esc(f.category)} · ثقة بصرية ${Math.round(Number(f.confidence)||0)}%</div></div><span class="sev ${esc(f.severity)}">${esc(f.severity)}</span></div><p>${esc(f.observation)}</p><div class="action-line"><b>الإجراء المقترح:</b> ${esc(f.action)}</div>`;li.appendChild(d);
-});
-const reposition=()=>{[...bx.children].forEach((el,k)=>placeBox(el,r.findings[k]?.box||{},stage,img))};
-if(!img.complete)img.addEventListener('load',reposition,{once:true});setTimeout(reposition,0);
-}
-function paintError(i,msg){
-const c=gallery.querySelector(`[data-id="${i.id}"]`),chip=c.querySelector('.status-chip');chip.textContent='فشل التحليل';chip.className='status-chip bad';c.querySelector('.finding-count').textContent='خطأ';c.querySelector('.summary').innerHTML=`<span class="error-text">${esc(msg)}</span>`;
-}
-async function analyzeOne(i){
-const c=gallery.querySelector(`[data-id="${i.id}"]`),chip=c.querySelector('.status-chip');chip.textContent='جارٍ التحليل…';chip.className='status-chip';
-const res=await fetch(ENDPOINT,{method:'POST',headers:{'apikey':SUPABASE_PUBLISHABLE,'Content-Type':'application/json'},body:JSON.stringify({image_data_url:i.aiDataUrl,filename:i.file.name})});
-let data={};try{data=await res.json()}catch{}
-if(!res.ok)throw new Error(data?.error||`تعذر التحليل (${res.status})`);
-if(data?.mode!=='ai'||!Array.isArray(data?.findings))throw new Error('رجعت نتيجة غير متوقعة من الخادم');
-return data;
-}
-analyzeBtn.onclick=async()=>{
-const p=items.filter(i=>!i.result&&!i.error);if(!p.length)return;analyzeBtn.disabled=true;clearBtn.disabled=true;progressWrap.classList.remove('hidden');progressBar.style.width='0%';progressPct.textContent='0%';notice.classList.remove('error-text');
-let n=0,failed=0;
-for(const i of p){
-progressText.textContent=`جاري تحليل الصورة ${n+1} من ${p.length}…`;
-try{i.result=await analyzeOne(i);paint(i)}catch(err){i.error=err.message||'فشل التحليل';failed++;paintError(i,i.error)}
-n++;const pc=Math.round(n/p.length*100);progressBar.style.width=pc+'%';progressPct.textContent=pc+'%';upd();
-}
-progressText.textContent=failed?`اكتمل التحليل — نجح ${p.length-failed} وتعذر ${failed}`:`اكتمل تحليل ${p.length} صورة`;
-clearBtn.disabled=false;upd();setTimeout(()=>progressWrap.classList.add('hidden'),1800);
-};
-window.addEventListener('resize',()=>{for(const i of items)if(i.result)paint(i)});
+function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('صيغة الصورة غير مدعومة'));im.src=src})}
+async function prepareForAI(file){const src=await readFile(file),img=await loadImage(src);const maxSide=1200,scale=Math.min(1,maxSide/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height)),w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale)),h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);return{preview:src,ai:canvas.toDataURL('image/jpeg',.72)}}
+async function addFiles(fs){const incoming=[...fs].filter(f=>f.type.startsWith('image/')||/\.(jpg|jpeg|png|webp|heic|heif)$/i.test(f.name)).slice(0,50-items.length);for(const f of incoming){try{const p=await prepareForAI(f),i={id:uid(),file:f,dataUrl:p.preview,aiDataUrl:p.ai,result:null,error:null};items.push(i);const n=template.content.firstElementChild.cloneNode(true);n.dataset.id=i.id;n.querySelector('.photo').src=i.dataUrl;n.querySelector('.filename').textContent=f.name;n.querySelector('.summary').textContent=size(f.size)+' — جاهزة للتحليل.';gallery.appendChild(n)}catch(err){notice.textContent=`تعذر تجهيز ${f.name}: ${err.message}`;notice.classList.add('error-text')}}fileInput.value='';upd()}
+function upd(){analyzeBtn.disabled=!items.length||items.every(i=>i.result||i.error);clearBtn.disabled=!items.length;countImages.textContent=items.length;const f=items.flatMap(i=>i.result?.findings||[]);countFindings.textContent=f.length;countHigh.textContent=f.filter(x=>['عالية','حرجة'].includes(x.severity)).length}
+fileInput.onchange=e=>addFiles(e.target.files);['dragenter','dragover'].forEach(x=>dropzone.addEventListener(x,e=>{e.preventDefault()}));dropzone.addEventListener('drop',e=>{e.preventDefault();addFiles(e.dataTransfer.files)});
+clearBtn.onclick=()=>{items=[];gallery.innerHTML='';fileInput.value='';notice.classList.remove('error-text');notice.textContent='التحليل بصري مساعد وليس ضمانًا لعدم وجود مخاطر. في الفئة المجانية تُرسل الصور إلى Google Gemini وقد تخضع لسياسة استخدام بيانات الفئة المجانية.';upd()};
+function imageRect(stage,img){const sw=stage.clientWidth,sh=stage.clientHeight,nw=img.naturalWidth||1,nh=img.naturalHeight||1,s=Math.min(sw/nw,sh/nh),dw=nw*s,dh=nh*s;return{left:(sw-dw)/2,top:(sh-dh)/2,width:dw,height:dh}}
+function placeBox(el,b,stage,img){const r=imageRect(stage,img),x=Math.max(0,Math.min(1000,+b.x||0)),y=Math.max(0,Math.min(1000,+b.y||0)),w=Math.max(1,Math.min(1000,+b.w||1)),h=Math.max(1,Math.min(1000,+b.h||1));el.style.left=(r.left+r.width*x/1000)+'px';el.style.top=(r.top+r.height*y/1000)+'px';el.style.width=(r.width*w/1000)+'px';el.style.height=(r.height*h/1000)+'px'}
+function paint(i){const c=gallery.querySelector(`[data-id="${i.id}"]`),r=i.result,bx=c.querySelector('.boxes'),li=c.querySelector('.findings'),chip=c.querySelector('.status-chip'),stage=c.querySelector('.image-stage'),img=c.querySelector('.photo');bx.innerHTML='';li.innerHTML='';c.querySelector('.finding-count').textContent=r.findings.length+' ملاحظة';c.querySelector('.summary').textContent=r.summary;chip.textContent=r.findings.length?'تم التحليل':'لا توجد ملاحظة واضحة';chip.className='status-chip ok';r.findings.forEach((f,k)=>{const e=document.createElement('div');e.className='bbox';e.innerHTML=`<span>${k+1}. ${esc(f.label)}</span>`;bx.appendChild(e);placeBox(e,f.box||{},stage,img);const d=document.createElement('div');d.className='finding';d.innerHTML=`<div class="finding-head"><div><h4>${k+1}. ${esc(f.label)}</h4><div class="meta">${esc(f.category)} · ثقة ${Math.round(Number(f.confidence)||0)}%</div></div><span class="sev ${esc(f.severity)}">${esc(f.severity)}</span></div><p>${esc(f.observation)}</p><div class="action-line"><b>الإجراء:</b> ${esc(f.action)}</div>`;li.appendChild(d)});const reposition=()=>[...bx.children].forEach((el,k)=>placeBox(el,r.findings[k]?.box||{},stage,img));if(!img.complete)img.addEventListener('load',reposition,{once:true});setTimeout(reposition,0)}
+function paintError(i,msg){const c=gallery.querySelector(`[data-id="${i.id}"]`),chip=c.querySelector('.status-chip');chip.textContent='فشل التحليل';chip.className='status-chip bad';c.querySelector('.finding-count').textContent='خطأ';c.querySelector('.summary').innerHTML=`<span class="error-text">${esc(msg)}</span>`}
+async function analyzeOne(i,key){const c=gallery.querySelector(`[data-id="${i.id}"]`),chip=c.querySelector('.status-chip');chip.textContent='جارٍ التحليل…';chip.className='status-chip';const base64=i.aiDataUrl.split(',')[1];const prompt=`افحص الصورة كمتخصص صحة وسلامة مهنية. اذكر فقط المخاطر أو الملاحظات الظاهرة بوضوح وبحد أقصى 6. اسم الملف: ${i.file.name}. أعد summary و findings. لكل finding: label, category, severity من منخفضة/متوسطة/عالية/حرجة، confidence من 0-100، observation، action، و box بإحداثيات نسبية من 0 إلى 1000: x,y للزاوية العلوية اليسرى وw,h للحجم. إذا لا توجد مشكلة واضحة أعد findings فارغة.`;const body={contents:[{parts:[{inline_data:{mime_type:'image/jpeg',data:base64}},{text:prompt}]}],generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema,maxOutputTokens:1200}};const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),35000);let res;try{res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal})}catch(err){if(err.name==='AbortError')throw new Error('تأخر التحليل أكثر من 35 ثانية. جرّب مرة أخرى.');throw new Error('تعذر الاتصال بـ Gemini من المتصفح. تحقق من الإنترنت أو المفتاح.')}finally{clearTimeout(timer)}let data={};try{data=await res.json()}catch{}if(!res.ok){const m=data?.error?.message||'';if(res.status===429)throw new Error('وصلت للحد المجاني مؤقتًا. انتظر قليلًا ثم جرّب.');if(res.status===400||res.status===403)throw new Error('مفتاح Gemini غير صالح أو غير مسموح لهذا المشروع.');throw new Error(m?`Gemini: ${m}`:`تعذر التحليل (${res.status})`)}const text=data?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('').trim();if(!text)throw new Error('لم يرجع Gemini نتيجة.');let result;try{result=JSON.parse(text)}catch{throw new Error('رجعت النتيجة بصيغة غير متوقعة.')}if(!Array.isArray(result.findings))result.findings=[];result.findings=result.findings.slice(0,6);result.summary=String(result.summary||'تم التحليل.');return result}
+analyzeBtn.onclick=async()=>{const key=getKey();if(!key){keyPanel.classList.remove('hidden');keyInput.focus();notice.textContent='الصق مفتاح Gemini أولًا ثم اضغط حفظ.';notice.classList.add('error-text');return}const p=items.filter(i=>!i.result&&!i.error);if(!p.length)return;analyzeBtn.disabled=true;clearBtn.disabled=true;progressWrap.classList.remove('hidden');progressBar.style.width='0%';progressPct.textContent='0%';notice.classList.remove('error-text');let n=0,failed=0;for(const i of p){progressText.textContent=`جاري تحليل الصورة ${n+1} من ${p.length}…`;try{i.result=await analyzeOne(i,key);paint(i)}catch(err){i.error=err.message||'فشل التحليل';failed++;paintError(i,i.error)}n++;const pc=Math.round(n/p.length*100);progressBar.style.width=pc+'%';progressPct.textContent=pc+'%';upd()}progressText.textContent=failed?`اكتمل — نجح ${p.length-failed} وتعذر ${failed}`:`اكتمل تحليل ${p.length} صورة`;clearBtn.disabled=false;upd();setTimeout(()=>progressWrap.classList.add('hidden'),2200)};
+window.addEventListener('resize',()=>{for(const i of items)if(i.result)paint(i)});upd();
 </script>
 </body>
 </html>
